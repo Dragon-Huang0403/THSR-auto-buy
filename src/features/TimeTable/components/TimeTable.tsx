@@ -22,10 +22,9 @@ export function TimeTable() {
     initialTimeTableParamsData
   );
   const timeTableMutation = trpc["time-table"].searchTable.useMutation();
-  console.log(timeTableMutation.data);
-
+  const departureTable = timeTableMutation.data?.DepartureTable;
   return (
-    <div>
+    <div className="flex h-screen flex-col p-5">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -79,6 +78,36 @@ export function TimeTable() {
         />
         <button type="submit">查詢</button>
       </form>
+
+      {departureTable && (
+        <div className="flex h-full flex-col overflow-hidden text-center">
+          <div className="flex justify-around">
+            <div>{departureTable.Title.StartStationName}</div>
+            <div>{departureTable.Title.EndStationName}</div>
+          </div>
+          <div>{departureTable.Title.TitleSplit2}</div>
+          <table className="flex h-full w-full flex-col text-center">
+            <thead>
+              <tr className="grid grid-cols-4">
+                <th>出發時間</th>
+                <th>到達時間</th>
+                <th>行車時間</th>
+                <th>車次</th>
+              </tr>
+            </thead>
+            <tbody className="h-full overflow-auto">
+              {departureTable.TrainItem.map((trainItem) => (
+                <tr key={trainItem.TrainNumber} className="grid grid-cols-4">
+                  <td>{trainItem.DepartureTime}</td>
+                  <td>{trainItem.DestinationTime}</td>
+                  <td>{trainItem.Duration}</td>
+                  <td>{trainItem.TrainNumber}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
