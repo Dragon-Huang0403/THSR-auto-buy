@@ -1,6 +1,10 @@
+import "react-calendar/dist/Calendar.css";
+
 import React, { useState } from "react";
+import Calendar from "react-calendar";
 
 import { searchTypes, stations } from "~/src/models/THSRTimeTable";
+import { getFormattedDate } from "~/src/utils/helper";
 import type { RouterInputs } from "~/src/utils/trpc";
 import { trpc } from "~/src/utils/trpc";
 
@@ -21,8 +25,10 @@ export function TimeTable() {
   const [timeTableParams, setTimeTableParams] = useState(
     initialTimeTableParamsData
   );
+  const [isCalendarShown, setIsCalendarShown] = useState(false);
   const timeTableMutation = trpc["time-table"].searchTable.useMutation();
   const departureTable = timeTableMutation.data?.DepartureTable;
+
   return (
     <div className="flex h-screen flex-col p-5">
       <form
@@ -76,6 +82,30 @@ export function TimeTable() {
             label: searchTypeText,
           }))}
         />
+        <div className="relative">
+          <div>{getFormattedDate(timeTableParams.OutWardSearchDate)}</div>
+          <button
+            type="button"
+            onClick={() => {
+              setIsCalendarShown(true);
+            }}
+          >
+            選擇日期
+          </button>
+          {isCalendarShown && (
+            <Calendar
+              value={timeTableParams.OutWardSearchDate}
+              onChange={(newDate: Date) => {
+                setTimeTableParams((prev) => ({
+                  ...prev,
+                  OutWardSearchDate: newDate,
+                }));
+                setIsCalendarShown(false);
+              }}
+              className="absolute"
+            />
+          )}
+        </div>
         <button type="submit">查詢</button>
       </form>
 
