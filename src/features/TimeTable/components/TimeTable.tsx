@@ -3,22 +3,35 @@ import "react-calendar/dist/Calendar.css";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 
-import { searchTypes, stations } from "~/src/models/THSRTimeTable";
-import { getFormattedDate } from "~/src/utils/helper";
+import type { Station } from "~/src/models/THSRTimeTable";
+import { stations } from "~/src/models/THSRTimeTable";
+import { selectableTime } from "~/src/utils/constants";
+import {
+  getFormattedDate,
+  getMinSearchTime,
+  padTo2Digit,
+} from "~/src/utils/helper";
 import type { RouterInputs } from "~/src/utils/trpc";
 import { trpc } from "~/src/utils/trpc";
 
 import { Select } from "./Select";
 
-const now = new Date();
-now.setDate(now.getDate() + 1);
+const minSearchTime = getMinSearchTime();
 
-const initialTimeTableParamsData: RouterInputs["time-table"]["searchTable"] = {
+type TimeTableParams = Omit<
+  RouterInputs["time-table"]["searchTable"],
+  "StartStation" | "EndStation"
+> & {
+  StartStation: Station;
+  EndStation: Station;
+};
+
+const initialTimeTableParamsData: TimeTableParams = {
   SearchType: "S",
   Lang: "TW",
-  StartStation: "NanGang",
-  EndStation: "ZuoYing",
-  OutWardSearchDate: now,
+  StartStation: stations[0],
+  EndStation: stations[11],
+  OutWardSearchDate: minSearchTime,
 };
 
 export function TimeTable() {
@@ -26,26 +39,46 @@ export function TimeTable() {
     initialTimeTableParamsData
   );
   const [isCalendarShown, setIsCalendarShown] = useState(false);
+
   const timeTableMutation = trpc["time-table"].searchTable.useMutation();
   const departureTable = timeTableMutation.data?.DepartureTable;
+
+  const { data: maxDate } = trpc["time-table"].availableDate.useQuery();
+
+  const { OutWardSearchDate } = timeTableParams;
+  const selectedTime: [number, number] = [
+    OutWardSearchDate.getHours(),
+    OutWardSearchDate.getMinutes(),
+  ];
+  const isToday = OutWardSearchDate.getDate() === minSearchTime.getDate();
 
   return (
     <div className="flex h-screen flex-col p-5">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          timeTableMutation.mutate(timeTableParams);
+          timeTableMutation.mutate({
+            ...timeTableParams,
+            StartStation: timeTableParams.StartStation[0],
+            EndStation: timeTableParams.EndStation[0],
+          });
         }}
       >
         <Select
           label="啟程站"
-          value={timeTableParams.StartStation}
-          onChange={(newValue) => {
-            setTimeTableParams((prev) => ({ ...prev, StartStation: newValue }));
+          value={{
+            label: timeTableParams.StartStation[1],
+            value: timeTableParams.StartStation,
           }}
-          options={stations.map(([stationValue, stationText]) => ({
-            value: stationValue,
-            label: stationText,
+          onChange={(newOption) => {
+            setTimeTableParams((prev) => ({
+              ...prev,
+              StartStation: newOption.value,
+            }));
+          }}
+          options={stations.map((station) => ({
+            value: station,
+            label: station[1],
           }))}
         />
         <div>
@@ -63,27 +96,51 @@ export function TimeTable() {
         </div>
         <Select
           label="到達站"
-          value={timeTableParams.EndStation}
-          onChange={(newValue) => {
-            setTimeTableParams((prev) => ({ ...prev, EndStation: newValue }));
+          value={{
+            label: timeTableParams.EndStation[1],
+            value: timeTableParams.EndStation,
           }}
-          options={stations.map(([stationValue, stationText]) => ({
-            value: stationValue,
-            label: stationText,
+          onChange={(newOption) => {
+            setTimeTableParams((prev) => ({
+              ...prev,
+              EndStation: newOption.value,
+            }));
+          }}
+          options={stations.map((station) => ({
+            value: station,
+            label: station[1],
           }))}
         />
         <Select
-          value={timeTableParams.SearchType}
-          onChange={(newValue) => {
-            setTimeTableParams((prev) => ({ ...prev, SearchType: newValue }));
+          label="選擇時間"
+          value={{
+            label: selectedTime.map((item) => padTo2Digit(item)).join(":"),
+            value: selectedTime,
           }}
-          options={searchTypes.map(([searchTypeValue, searchTypeText]) => ({
-            value: searchTypeValue,
-            label: searchTypeText,
-          }))}
+          onChange={(newOption) => {
+            const newDate = new Date(OutWardSearchDate);
+            newDate.setHours(newOption.value[0]);
+            newDate.setMinutes(newOption.value[1]);
+            setTimeTableParams((prev) => ({
+              ...prev,
+              OutWardSearchDate: newDate,
+            }));
+          }}
+          options={selectableTime
+            .filter(
+              (time) =>
+                !isToday ||
+                time[0] > minSearchTime.getHours() ||
+                (time[0] === minSearchTime.getHours() &&
+                  time[1] === minSearchTime.getMinutes())
+            )
+            .map((time) => ({
+              value: time,
+              label: time.map((item) => padTo2Digit(item)).join(":"),
+            }))}
         />
         <div className="relative">
-          <div>{getFormattedDate(timeTableParams.OutWardSearchDate)}</div>
+          <div>{getFormattedDate(OutWardSearchDate)}</div>
           <button
             type="button"
             onClick={() => {
@@ -94,8 +151,10 @@ export function TimeTable() {
           </button>
           {isCalendarShown && (
             <Calendar
-              value={timeTableParams.OutWardSearchDate}
+              value={OutWardSearchDate}
               onChange={(newDate: Date) => {
+                newDate.setHours(OutWardSearchDate.getHours());
+                newDate.setMinutes(OutWardSearchDate.getMinutes());
                 setTimeTableParams((prev) => ({
                   ...prev,
                   OutWardSearchDate: newDate,
@@ -103,6 +162,11 @@ export function TimeTable() {
                 setIsCalendarShown(false);
               }}
               className="absolute"
+              minDate={minSearchTime}
+              maxDate={maxDate}
+              view="month"
+              prev2Label={null}
+              next2Label={null}
             />
           )}
         </div>

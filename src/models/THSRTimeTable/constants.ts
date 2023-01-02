@@ -1,6 +1,6 @@
-import type { SearchType, Stations, StationValue } from "./THSRTimeTable";
+import type { SearchType, StationValue } from "./THSRTimeTable";
 
-export const stations: Stations = [
+export const stations = [
   ["NanGang", "南港"],
   ["TaiPei", "台北"],
   ["BanQiao", "板橋"],
@@ -13,7 +13,7 @@ export const stations: Stations = [
   ["JiaYi", "嘉義"],
   ["TaiNan", "台南"],
   ["ZuoYing", "左營"],
-];
+] as const;
 
 export const stationValues = stations.map((station) => station[0]) as [
   StationValue,

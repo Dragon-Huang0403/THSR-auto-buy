@@ -1,26 +1,17 @@
 import type { ValueOf } from "next/dist/shared/lib/constants";
 
+import type { stations } from "./constants";
+
 type DiscountType = {
   earlyBird: "e1b4c4d9-98d7-4c8c-9834-e1d2528750f1";
   collegeStudent: "68d9fc7b-7330-44c2-962a-74bc47d2ee8a";
 };
 
-export type StationValue =
-  | "NanGang"
-  | "TaiPei"
-  | "BanQiao"
-  | "TaoYuan"
-  | "XinZhu"
-  | "MiaoLi"
-  | "TaiZhong"
-  | "ZhangHua"
-  | "YunLin"
-  | "JiaYi"
-  | "TaiNan"
-  | "ZuoYing";
+export type StationValue = typeof stations[number][0];
+type StationText = typeof stations[number][1];
 
-type StationText = string;
-export type Stations = Array<[StationValue, StationText]>;
+export type Station = typeof stations[number];
+export type Stations = typeof stations;
 
 /**
  * S 為單程
