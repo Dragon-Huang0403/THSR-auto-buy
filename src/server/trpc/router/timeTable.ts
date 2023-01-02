@@ -46,8 +46,7 @@ export const timeTableRouter = router({
           message: "不能選擇太久以後的時間",
         });
       }
-
-      return postTHSRTimeTable({
+      const response = await postTHSRTimeTable({
         SearchType: input.SearchType,
         Lang: input.Lang,
         StartStation: input.StartStation,
@@ -55,6 +54,16 @@ export const timeTableRouter = router({
         OutWardSearchDate: getFormattedDate(input.OutWardSearchDate),
         OutWardSearchTime: getFormattedTime(input.OutWardSearchDate),
       });
+      const result = {
+        ...response.DepartureTable,
+        TrainItem: response.DepartureTable.TrainItem.filter((item) => {
+          const departureDate = new Date(
+            `${item.RunDate} ${item.DepartureTime}`
+          );
+          return departureDate > input.OutWardSearchDate;
+        }),
+      };
+      return result;
     }),
   availableDate: publicProcedure.query(() => getAvailableDate()),
 });

@@ -40,8 +40,7 @@ export function TimeTable() {
   );
   const [isCalendarShown, setIsCalendarShown] = useState(false);
 
-  const timeTableMutation = trpc["time-table"].searchTable.useMutation();
-  const departureTable = timeTableMutation.data?.DepartureTable;
+  const departureTableMutation = trpc["time-table"].searchTable.useMutation();
 
   const { data: maxDate } = trpc["time-table"].availableDate.useQuery();
 
@@ -57,7 +56,7 @@ export function TimeTable() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          timeTableMutation.mutate({
+          departureTableMutation.mutate({
             ...timeTableParams,
             StartStation: timeTableParams.StartStation[0],
             EndStation: timeTableParams.EndStation[0],
@@ -173,13 +172,13 @@ export function TimeTable() {
         <button type="submit">查詢</button>
       </form>
 
-      {departureTable && (
+      {departureTableMutation.data && (
         <div className="flex h-full flex-col overflow-hidden text-center">
           <div className="flex justify-around">
-            <div>{departureTable.Title.StartStationName}</div>
-            <div>{departureTable.Title.EndStationName}</div>
+            <div>{departureTableMutation.data.Title.StartStationName}</div>
+            <div>{departureTableMutation.data.Title.EndStationName}</div>
           </div>
-          <div>{departureTable.Title.TitleSplit2}</div>
+          <div>{departureTableMutation.data.Title.TitleSplit2}</div>
           <table className="flex h-full w-full flex-col text-center">
             <thead>
               <tr className="grid grid-cols-4">
@@ -190,7 +189,7 @@ export function TimeTable() {
               </tr>
             </thead>
             <tbody className="h-full overflow-auto">
-              {departureTable.TrainItem.map((trainItem) => (
+              {departureTableMutation.data.TrainItem.map((trainItem) => (
                 <tr key={trainItem.TrainNumber} className="grid grid-cols-4">
                   <td>{trainItem.DepartureTime}</td>
                   <td>{trainItem.DestinationTime}</td>
