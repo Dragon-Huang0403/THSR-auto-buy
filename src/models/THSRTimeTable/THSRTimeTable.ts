@@ -84,8 +84,7 @@ interface PriceTableColumn {
   BusinessPrice: Price;
   Unreserved: Price;
 }
-
-interface TimeTable {
+export interface TimeTable {
   Title: Title;
   TrainItem: TrainItem[];
 }
