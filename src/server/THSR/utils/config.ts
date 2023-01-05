@@ -1,3 +1,6 @@
+import got from "got";
+import { CookieJar } from "tough-cookie";
+
 import type {
   BookingOptions,
   PostAvailableTrainsRequest,
@@ -14,7 +17,7 @@ export const thsrUrls = {
   bookingPage: `${baseUrl}/IMINT/`,
 };
 
-export const defaultHeaders = {
+const defaultHeaders = {
   "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
   Accept:
@@ -59,3 +62,16 @@ export const submitTicketRequestFiller: Omit<
   idInputRadio: 0,
   isSPromotion: 1,
 };
+
+export function getClient() {
+  const cookieJar = new CookieJar();
+  const client = got.extend({
+    cookieJar,
+    headers: defaultHeaders,
+    followRedirect: true,
+    timeout: {
+      request: 1000 * 10,
+    },
+  });
+  return client;
+}

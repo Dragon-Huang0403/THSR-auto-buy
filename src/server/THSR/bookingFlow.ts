@@ -1,7 +1,5 @@
 import type { Got } from "got";
-import { got } from "got";
 import parse from "node-html-parser";
-import { CookieJar, MemoryCookieStore } from "tough-cookie";
 
 import type {
   BookingOptions,
@@ -14,7 +12,7 @@ import { getCaptchaResult } from "./utils/captchaHelpers";
 import {
   availableTrainRequestFiller,
   confirmTrainRequestFiller,
-  defaultHeaders,
+  getClient,
   submitTicketRequestFiller,
   thsrUrls,
 } from "./utils/config";
@@ -30,14 +28,7 @@ export async function bookingFlow(
   buyerInfo: BuyerInfo,
   buyNthTrainItem = 0
 ) {
-  const store = new MemoryCookieStore();
-  const cookieJar = new CookieJar(store, { rejectPublicSuffixes: false });
-
-  const client = got.extend({
-    cookieJar,
-    headers: defaultHeaders,
-    followRedirect: true,
-  });
+  const client = getClient();
 
   const { bookingMethod, captchaImageUrl } = await visitBookingPage(client);
 
