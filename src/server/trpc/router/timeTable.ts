@@ -5,7 +5,7 @@ import { stationValues } from "~/src/models/THSRTimeTable";
 import {
   getAvailableDate,
   postTHSRTimeTable,
-} from "~/src/server/THSR/utils/api";
+} from "~/src/server/THSR/utils/searchApis";
 import {
   getFormattedDate,
   getFormattedTime,

@@ -1,12 +1,17 @@
-import got from "got";
-import { CookieJar } from "tough-cookie";
+import type {
+  BookingOptions,
+  PostAvailableTrainsRequest,
+  PostConfirmTrainRequest,
+  PostSubmitTicketRequest,
+} from "./bookingRequestSchema";
 
-const baseUrl = "https://irs.thsrc.com.tw";
 const searchBaseUrl = "https://www.thsrc.com.tw";
+const baseUrl = "https://irs.thsrc.com.tw";
 export const thsrUrls = {
-  base: baseUrl,
+  baseUrl: baseUrl,
   timeTableSearch: `${searchBaseUrl}/TimeTable/Search`,
   availableDate: `${searchBaseUrl}/RawData/EAIIRS_20230102.xml`,
+  bookingPage: `${baseUrl}/IMINT/`,
 };
 
 export const defaultHeaders = {
@@ -15,12 +20,42 @@ export const defaultHeaders = {
   Accept:
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
   Connection: "keep-alive",
-  // Host: "irs.thsrc.com.tw",
   "Accept-Language": "zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3",
 };
 
-const cookieJar = new CookieJar();
-export const client = got.extend({
-  headers: defaultHeaders,
-  cookieJar,
-});
+export const availableTrainRequestFiller: Omit<
+  PostAvailableTrainsRequest,
+  "bookingMethod" | "homeCaptcha:securityCode" | keyof BookingOptions
+> = {
+  "wicket:interface": ":0:BookingS1Form::IFormSubmitListener",
+  "BookingS1Form:hf:0": "",
+  toTrainIDInputField: "",
+  backTimeInputField: "",
+};
+
+export const confirmTrainRequestFiller: Pick<
+  PostConfirmTrainRequest,
+  "BookingS2Form:hf:0" | "wicket:interface"
+> = {
+  "wicket:interface": ":1:BookingS2Form::IFormSubmitListener",
+  "BookingS2Form:hf:0": "",
+};
+
+export const submitTicketRequestFiller: Omit<
+  PostSubmitTicketRequest,
+  | "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup"
+  | "dummyId"
+  | "dummyPhone"
+  | "email"
+  | "passengerCount"
+> = {
+  "wicket:interface": ":2:BookingS3Form::IFormSubmitListener",
+  "BookingS3FormSP:hf:0": "",
+  diffOver: 1,
+  agree: "on",
+  TgoError: 1,
+  backHome: "",
+  isGoBackM: "",
+  idInputRadio: 0,
+  isSPromotion: 1,
+};
