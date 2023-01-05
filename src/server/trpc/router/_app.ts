@@ -1,8 +1,10 @@
 import { router } from "../trpc";
-import { timeTableRouter } from "./timeTable";
+import { bookRouter } from "./bookRouter";
+import { searchRouter } from "./searchRouter";
 
 export const appRouter = router({
-  ["time-table"]: timeTableRouter,
+  ["book"]: bookRouter,
+  ["search"]: searchRouter,
 });
 
 // export type definition of API

@@ -12,7 +12,7 @@ import type { RouterInputs } from "~/src/utils/trpc";
 import { Select } from "../Select";
 
 export type SearchBarParams = Omit<
-  RouterInputs["time-table"]["searchTable"],
+  RouterInputs["search"]["timeTable"],
   "StartStation" | "EndStation"
 > & {
   StartStation: Station;

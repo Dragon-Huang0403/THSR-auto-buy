@@ -18,9 +18,9 @@ const initialTimeTableParamsData: SearchBarParams = {
 };
 
 const SearchPage: NextPage = () => {
-  const departureTableMutation = trpc["time-table"].searchTable.useMutation();
+  const departureTableMutation = trpc.search.timeTable.useMutation();
 
-  const { data: maxDate } = trpc["time-table"].availableDate.useQuery();
+  const { data: maxDate } = trpc.search.availableDate.useQuery();
 
   return (
     <div className="flex h-screen flex-col p-5">
@@ -36,7 +36,6 @@ const SearchPage: NextPage = () => {
           });
         }}
       />
-
       {departureTableMutation.data && (
         <TimeTable value={departureTableMutation.data} />
       )}

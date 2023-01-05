@@ -14,8 +14,8 @@ import {
 
 import { publicProcedure, router } from "../trpc";
 
-export const timeTableRouter = router({
-  searchTable: publicProcedure
+export const searchRouter = router({
+  timeTable: publicProcedure
     .input(
       z.object({
         SearchType: z.enum(["S", "R"]),
