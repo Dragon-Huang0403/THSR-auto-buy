@@ -24,6 +24,7 @@ const ReservePage: NextPage = () => {
               "ticketPanel:rows:2:ticketAmount": "0W",
               "ticketPanel:rows:3:ticketAmount": "0E",
               "ticketPanel:rows:4:ticketAmount": "0P",
+              toTrainIDInputField: "0609",
             },
             buyerInfo: {
               dummyId: "A123456789",

@@ -1,34 +1,25 @@
 import type {
-  adultTicketValues,
-  childTicketValues,
-  collegeTicketValues,
-  disabledTicketValues,
-  elderTicketValues,
+  AdultTicketValue,
+  ChildTicketValue,
+  CollegeTicketValue,
+  DisabledTicketValue,
+  ElderTicketValue,
   StationValue,
-  toTimeTableValues,
-} from "~/src/models/thsr";
+  ToTimeTableValue,
+} from "./types";
 
-type AdultTicketValues = typeof adultTicketValues;
-type ChildTicketValues = typeof childTicketValues;
-type DisabledTicketValues = typeof disabledTicketValues;
-type ElderTicketValues = typeof elderTicketValues;
-type CollegeTicketValues = typeof collegeTicketValues;
-
-type ToTimeTableValue = typeof toTimeTableValues[number];
-
-export type BookingOptions = {
+export type CommonBookingOptions = {
   selectStartStation: StationValue;
   selectDestinationStation: StationValue;
+  /**
+   * @pattern "yyyy/mm/dd"
+   */
+  toTimeInputField: string;
   /**
    * 0: Standard Car
    * 1: Business Car
    */
   "trainCon:trainRadioGroup": 0 | 1;
-  /**
-   * 0: Single Trip
-   * 1: Round Trip
-   */
-  "tripCon:typesoftrip": 0 | 1;
   /**
    * 0: No Required
    * 1: Window Seat
@@ -36,37 +27,43 @@ export type BookingOptions = {
    */
   "seatCon:seatRadioGroup": 0 | 1 | 2;
   /**
-   * Need to get from page.
-   * @pattern /radio\d+/
+   * 0: Single Trip
+   * 1: Round Trip
    */
-  toTimeInputField: string;
-  toTimeTable: ToTimeTableValue;
+  "tripCon:typesoftrip": 0 | 1;
   /**
    * Adult Tickets
    */
-  "ticketPanel:rows:0:ticketAmount": AdultTicketValues[number];
+  "ticketPanel:rows:0:ticketAmount": AdultTicketValue;
   /**
    * Child Tickets (6-11)
    */
-  "ticketPanel:rows:1:ticketAmount": ChildTicketValues[number];
+  "ticketPanel:rows:1:ticketAmount": ChildTicketValue;
   /**
    * Disabled ticket (Taiwan only)
    */
-  "ticketPanel:rows:2:ticketAmount": DisabledTicketValues[number];
-
+  "ticketPanel:rows:2:ticketAmount": DisabledTicketValue;
   /**
    * Elder ticket (Taiwan only)
    */
-  "ticketPanel:rows:3:ticketAmount": ElderTicketValues[number];
+  "ticketPanel:rows:3:ticketAmount": ElderTicketValue;
   /**
    * College student ticket (Taiwan only)
    */
-  "ticketPanel:rows:4:ticketAmount": CollegeTicketValues[number];
+  "ticketPanel:rows:4:ticketAmount": CollegeTicketValue;
 };
 
-export type PostAvailableTrainsRequest = BookingOptions & {
+export type BookingByDateOptions = {
+  toTimeTable: ToTimeTableValue;
+} & CommonBookingOptions;
+
+export type PostAvailableTrainsRequest = BookingByDateOptions & {
   "wicket:interface": ":0:BookingS1Form::IFormSubmitListener";
   "BookingS1Form:hf:0": "";
+  /**
+   * Need to get from page.
+   * @pattern /radio\d+/
+   */
   bookingMethod: string;
   /**
    * @pattern "yyyy/mm/dd"
@@ -86,7 +83,7 @@ export type PostConfirmTrainRequest = {
 };
 
 export type PostSubmitTicketRequest = {
-  "wicket:interface": ":2:BookingS3Form::IFormSubmitListener";
+  "wicket:interface": `:${1 | 2}:BookingS3Form::IFormSubmitListener`;
   "BookingS3FormSP:hf:0": "";
   diffOver: 1;
   /**
@@ -113,3 +110,18 @@ export type BuyerInfo = Pick<
   PostSubmitTicketRequest,
   "dummyId" | "dummyPhone" | "email"
 >;
+
+export type BookingByTrainNoOptions = {
+  toTrainIDInputField: string;
+} & CommonBookingOptions;
+
+export type BookingByTrainNoRequest = {
+  "wicket:interface": ":0:BookingS1Form::IFormSubmitListener";
+  "BookingS1Form:hf:0": "";
+  /**
+   * @pattern /radio\d+/
+   */
+  bookingMethod: string;
+  toTimeTable: "";
+  "homeCaptcha:securityCode": string;
+} & BookingByTrainNoOptions;

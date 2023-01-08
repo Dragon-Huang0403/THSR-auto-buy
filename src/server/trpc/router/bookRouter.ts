@@ -10,7 +10,10 @@ import {
   toTimeTableValues,
 } from "~/src/models/thsr/constants";
 
-import { bookingFlow } from "../../THSR/bookingFlow";
+import {
+  bookingByDateFlow,
+  bookingByTrainNoFlow,
+} from "../../THSR/bookingFlow";
 import { publicProcedure, router } from "../trpc";
 
 export const bookRouter = router({
@@ -33,6 +36,7 @@ export const bookRouter = router({
           "ticketPanel:rows:2:ticketAmount": z.enum(disabledTicketValues),
           "ticketPanel:rows:3:ticketAmount": z.enum(elderTicketValues),
           "ticketPanel:rows:4:ticketAmount": z.enum(collegeTicketValues),
+          toTrainIDInputField: z.string(),
         }),
         buyerInfo: z.object({
           dummyId: z.string().length(10),
@@ -43,12 +47,21 @@ export const bookRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const result = await bookingFlow(
-        input.bookingOptions,
-        input.buyerInfo,
-        input.buyNthTrainItem
-      );
-      console.log(result);
+      let result;
+      if (input.bookingOptions.toTrainIDInputField) {
+        result = await bookingByTrainNoFlow(
+          input.bookingOptions,
+          input.buyerInfo
+        );
+      } else {
+        result = await bookingByDateFlow(
+          input.bookingOptions,
+          input.buyerInfo,
+          input.buyNthTrainItem
+        );
+      }
+
+      console.log({ result });
 
       return result;
     }),

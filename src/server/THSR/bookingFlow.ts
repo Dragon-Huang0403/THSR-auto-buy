@@ -2,7 +2,9 @@ import type { Got } from "got";
 import parse from "node-html-parser";
 
 import type {
-  BookingOptions,
+  BookingByDateOptions,
+  BookingByTrainNoOptions as BookingByTrainNoOptions,
+  BookingByTrainNoRequest,
   BuyerInfo,
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
@@ -12,6 +14,7 @@ import type {
 import { getCaptchaResult } from "./utils/captchaHelpers";
 import {
   availableTrainRequestFiller,
+  bookingByTainIdRequestFiller,
   confirmTrainRequestFiller,
   getClient,
   submitTicketRequestFiller,
@@ -24,15 +27,13 @@ import {
   parseTrains,
 } from "./utils/parseHelper";
 
-export async function bookingFlow(
-  bookingOptions: BookingOptions,
+export async function bookingByDateFlow(
+  bookingOptions: BookingByDateOptions,
   buyerInfo: BuyerInfo,
   buyNthTrainItem = 0
 ) {
   const client = getClient();
-
-  const { bookingMethod, captchaImageUrl } = await visitBookingPage(client);
-
+  const { bookingMethods, captchaImageUrl } = await visitBookingPage(client);
   const captchaResult = await getCaptchaResult(client, captchaImageUrl);
 
   const trainValue = await getAvailableTrains(
@@ -41,7 +42,7 @@ export async function bookingFlow(
       ...bookingOptions,
       ...availableTrainRequestFiller,
       "homeCaptcha:securityCode": captchaResult,
-      bookingMethod,
+      bookingMethod: bookingMethods[0],
     },
     buyNthTrainItem
   );
@@ -54,6 +55,34 @@ export async function bookingFlow(
   const purchaseResult = await submitTicket(client, {
     ...submitTicketRequestFiller,
     ...buyerInfo,
+    "wicket:interface": ":2:BookingS3Form::IFormSubmitListener",
+    passengerCount: getPassengerAmount(bookingOptions),
+    "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup":
+      memberValue,
+  });
+
+  return purchaseResult;
+}
+
+export async function bookingByTrainNoFlow(
+  bookingOptions: BookingByTrainNoOptions,
+  buyerInfo: BuyerInfo
+) {
+  const client = getClient();
+  const { bookingMethods, captchaImageUrl } = await visitBookingPage(client);
+  const captchaResult = await getCaptchaResult(client, captchaImageUrl);
+
+  const memberValue = await confirmTrain(client, {
+    ...bookingByTainIdRequestFiller,
+    ...bookingOptions,
+    bookingMethod: bookingMethods[1],
+    "homeCaptcha:securityCode": captchaResult,
+  });
+
+  const purchaseResult = await submitTicket(client, {
+    ...submitTicketRequestFiller,
+    ...buyerInfo,
+    "wicket:interface": ":1:BookingS3Form::IFormSubmitListener",
     passengerCount: getPassengerAmount(bookingOptions),
     "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup":
       memberValue,
@@ -71,10 +100,15 @@ async function visitBookingPage(client: Got) {
     throw new Error(pageErrors.join(". "));
   }
 
-  const bookingMethod = page
-    .querySelector("[name=bookingMethod][data-target=search-by-time]")
-    ?.getAttribute("value");
-  if (!bookingMethod) {
+  /**
+   * bookingMethods[0] = search-by-time
+   * bookingMethods[1] = search-by-trainNo
+   */
+  const bookingMethods = page
+    .querySelectorAll("[name=bookingMethod]")
+    .map((element) => element.getAttribute("value")) as [string, string];
+
+  if (bookingMethods.length !== 2) {
     throw new Error("Can't find booking method");
   }
 
@@ -88,7 +122,7 @@ async function visitBookingPage(client: Got) {
   captchaImageUrl = thsrUrls.baseUrl + captchaImageUrl;
 
   return {
-    bookingMethod,
+    bookingMethods,
     captchaImageUrl,
   };
 }
@@ -120,7 +154,7 @@ async function getAvailableTrains(
 
 async function confirmTrain(
   client: Got,
-  confirmTrainRequest: PostConfirmTrainRequest
+  confirmTrainRequest: PostConfirmTrainRequest | BookingByTrainNoRequest
 ) {
   const { body } = await client.post(thsrUrls.bookingPage, {
     searchParams: confirmTrainRequest,

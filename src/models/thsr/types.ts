@@ -1,6 +1,15 @@
 import type { ValueOf } from "next/dist/shared/lib/constants";
 
-import type { searchTypes, stationObjects } from "./constants";
+import type {
+  adultTicketValues,
+  childTicketValues,
+  collegeTicketValues,
+  disabledTicketValues,
+  elderTicketValues,
+  searchTypes,
+  stationObjects,
+  toTimeTableValues,
+} from "./constants";
 
 type DiscountType = {
   earlyBird: "e1b4c4d9-98d7-4c8c-9834-e1d2528750f1";
@@ -140,3 +149,11 @@ interface Title {
    */
   TitleSplit2: string;
 }
+
+export type AdultTicketValue = typeof adultTicketValues[number];
+export type ChildTicketValue = typeof childTicketValues[number];
+export type DisabledTicketValue = typeof disabledTicketValues[number];
+export type ElderTicketValue = typeof elderTicketValues[number];
+export type CollegeTicketValue = typeof collegeTicketValues[number];
+
+export type ToTimeTableValue = typeof toTimeTableValues[number];

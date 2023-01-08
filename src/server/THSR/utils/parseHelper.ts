@@ -1,6 +1,6 @@
 import type { HTMLElement } from "node-html-parser";
 
-import type { BookingOptions } from "~/src/models/thsr";
+import type { CommonBookingOptions } from "~/src/models/thsr";
 
 export function parseTrains(page: HTMLElement) {
   const trainItemQuery = ".result-item input";
@@ -48,6 +48,13 @@ export function parsePageErrors(page: HTMLElement) {
     return ["Cookie Expired"];
   }
 
+  const hasServerInternalError = page.querySelector(
+    ".error-card .error-content"
+  );
+  if (hasServerInternalError) {
+    return ["Server Internal Error"];
+  }
+
   const errors = page
     .querySelectorAll(".feedbackPanelERROR")
     .map(
@@ -62,10 +69,10 @@ export function parsePageErrors(page: HTMLElement) {
   return errors;
 }
 
-export function getPassengerAmount(bookingOptions: BookingOptions) {
+export function getPassengerAmount(bookingOptions: CommonBookingOptions) {
   let passengerCount = 0;
   Object.keys(bookingOptions).forEach((_key) => {
-    const key = _key as keyof BookingOptions;
+    const key = _key as keyof CommonBookingOptions;
     if (key.includes("ticketAmount")) {
       passengerCount += parseInt(bookingOptions[key] as string);
     }

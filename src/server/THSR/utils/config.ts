@@ -2,7 +2,9 @@ import got from "got";
 import { CookieJar } from "tough-cookie";
 
 import type {
-  BookingOptions,
+  BookingByDateOptions,
+  BookingByTrainNoOptions,
+  BookingByTrainNoRequest,
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
@@ -24,11 +26,12 @@ const defaultHeaders = {
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
   Connection: "keep-alive",
   "Accept-Language": "zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+  "Content-Type": "application/x-www-form-urlencoded",
 };
 
 export const availableTrainRequestFiller: Omit<
   PostAvailableTrainsRequest,
-  "bookingMethod" | "homeCaptcha:securityCode" | keyof BookingOptions
+  "bookingMethod" | "homeCaptcha:securityCode" | keyof BookingByDateOptions
 > = {
   "wicket:interface": ":0:BookingS1Form::IFormSubmitListener",
   "BookingS1Form:hf:0": "",
@@ -51,8 +54,8 @@ export const submitTicketRequestFiller: Omit<
   | "dummyPhone"
   | "email"
   | "passengerCount"
+  | "wicket:interface"
 > = {
-  "wicket:interface": ":2:BookingS3Form::IFormSubmitListener",
   "BookingS3FormSP:hf:0": "",
   diffOver: 1,
   agree: "on",
@@ -61,6 +64,15 @@ export const submitTicketRequestFiller: Omit<
   isGoBackM: "",
   idInputRadio: 0,
   isSPromotion: 1,
+};
+
+export const bookingByTainIdRequestFiller: Omit<
+  BookingByTrainNoRequest,
+  "bookingMethod" | "homeCaptcha:securityCode" | keyof BookingByTrainNoOptions
+> = {
+  "wicket:interface": ":0:BookingS1Form::IFormSubmitListener",
+  "BookingS1Form:hf:0": "",
+  toTimeTable: "",
 };
 
 export function getClient() {
