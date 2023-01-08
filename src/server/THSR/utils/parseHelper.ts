@@ -1,6 +1,6 @@
 import type { HTMLElement } from "node-html-parser";
 
-import type { BookingOptions } from "./bookingRequestSchema";
+import type { BookingOptions } from "~/src/models/thsr";
 
 export function parseTrains(page: HTMLElement) {
   const trainItemQuery = ".result-item input";

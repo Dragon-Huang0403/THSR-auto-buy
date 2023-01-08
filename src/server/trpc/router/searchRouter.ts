@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { stationValues } from "~/src/models/THSRTimeTable";
+import { stations } from "~/src/models/thsr";
 import {
   getAvailableDate,
   postTHSRTimeTable,
@@ -20,8 +20,8 @@ export const searchRouter = router({
       z.object({
         SearchType: z.enum(["S", "R"]),
         Lang: z.literal("TW"),
-        StartStation: z.enum(stationValues),
-        EndStation: z.enum(stationValues),
+        StartStation: z.enum(stations),
+        EndStation: z.enum(stations),
         OutWardSearchDate: z.date(),
         ReturnSearchDate: z.date().optional(),
       })

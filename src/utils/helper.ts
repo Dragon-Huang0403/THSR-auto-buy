@@ -1,4 +1,5 @@
 import { selectableTime } from "./constants";
+import type { DropFirstFewInTuple, EnumerateStringArray } from "./typeHelper";
 
 export function padTo2Digit(num: number) {
   return num.toString().padStart(2, "0");
@@ -33,4 +34,16 @@ export function getMinSearchTime() {
     now.setMinutes(findLatestTime[1]);
   }
   return now;
+}
+
+export function intRangeArray<
+  Min extends number,
+  Max extends number,
+  PostFix extends string = ""
+>(min: Min, max: Max, postFix: PostFix = "" as PostFix) {
+  const arr = [];
+  for (let i = min; i < max; i++) {
+    arr.push(`${i}${postFix}`);
+  }
+  return arr as DropFirstFewInTuple<Min, EnumerateStringArray<Max, PostFix>>;
 }

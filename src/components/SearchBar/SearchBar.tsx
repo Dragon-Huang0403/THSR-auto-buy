@@ -3,8 +3,8 @@ import "react-calendar/dist/Calendar.css";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 
-import type { Station } from "~/src/models/THSRTimeTable";
-import { stations } from "~/src/models/THSRTimeTable";
+import type { Station } from "~/src/models/thsr";
+import { stationObjects, stations } from "~/src/models/thsr";
 import { selectableTime } from "~/src/utils/constants";
 import { getFormattedDate, padTo2Digit } from "~/src/utils/helper";
 import type { RouterInputs } from "~/src/utils/trpc";
@@ -51,7 +51,7 @@ export function SearchBar({
       <Select
         label="啟程站"
         value={{
-          label: searchBarParams.StartStation[1],
+          label: stationObjects[searchBarParams.StartStation].name,
           value: searchBarParams.StartStation,
         }}
         onChange={(newOption) => {
@@ -62,7 +62,7 @@ export function SearchBar({
         }}
         options={stations.map((station) => ({
           value: station,
-          label: station[1],
+          label: stationObjects[station].name,
         }))}
       />
       <div>
@@ -81,7 +81,7 @@ export function SearchBar({
       <Select
         label="到達站"
         value={{
-          label: searchBarParams.EndStation[1],
+          label: stationObjects[searchBarParams.EndStation].name,
           value: searchBarParams.EndStation,
         }}
         onChange={(newOption) => {
@@ -92,7 +92,7 @@ export function SearchBar({
         }}
         options={stations.map((station) => ({
           value: station,
-          label: station[1],
+          label: stationObjects[station].name,
         }))}
       />
       <Select

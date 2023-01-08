@@ -3,7 +3,7 @@ import got from "got";
 import type {
   PostTHSRTimeTableRequest,
   PostTHSRTimeTableResponse,
-} from "~/src/models/THSRTimeTable";
+} from "~/src/models/thsr";
 
 import { thsrUrls } from "./config";
 

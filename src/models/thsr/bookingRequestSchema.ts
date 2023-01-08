@@ -1,8 +1,24 @@
-type ZeroToTen = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+import type {
+  adultTicketValues,
+  childTicketValues,
+  collegeTicketValues,
+  disabledTicketValues,
+  elderTicketValues,
+  StationValue,
+  toTimeTableValues,
+} from "~/src/models/thsr";
+
+type AdultTicketValues = typeof adultTicketValues;
+type ChildTicketValues = typeof childTicketValues;
+type DisabledTicketValues = typeof disabledTicketValues;
+type ElderTicketValues = typeof elderTicketValues;
+type CollegeTicketValues = typeof collegeTicketValues;
+
+type ToTimeTableValue = typeof toTimeTableValues[number];
 
 export type BookingOptions = {
-  selectStartStation: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  selectDestinationStation: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  selectStartStation: StationValue;
+  selectDestinationStation: StationValue;
   /**
    * 0: Standard Car
    * 1: Business Car
@@ -20,70 +36,32 @@ export type BookingOptions = {
    */
   "seatCon:seatRadioGroup": 0 | 1 | 2;
   /**
-   * Format: "radio[0-9]+"
    * Need to get from page.
+   * @pattern /radio\d+/
    */
   toTimeInputField: string;
-  toTimeTable:
-    | "1201A"
-    | "1230A"
-    | "600A"
-    | "630A"
-    | "700A"
-    | "730A"
-    | "800A"
-    | "830A"
-    | "900A"
-    | "930A"
-    | "1000A"
-    | "1030A"
-    | "1100A"
-    | "1130A"
-    | "1200N"
-    | "1230P"
-    | "100P"
-    | "130P"
-    | "200P"
-    | "230P"
-    | "300P"
-    | "330P"
-    | "400P"
-    | "430P"
-    | "500P"
-    | "530P"
-    | "600P"
-    | "630P"
-    | "700P"
-    | "730P"
-    | "800P"
-    | "830P"
-    | "900P"
-    | "930P"
-    | "1000P"
-    | "1030P"
-    | "1100P"
-    | "1130P";
+  toTimeTable: ToTimeTableValue;
   /**
    * Adult Tickets
    */
-  "ticketPanel:rows:0:ticketAmount": `${ZeroToTen}F`;
+  "ticketPanel:rows:0:ticketAmount": AdultTicketValues[number];
   /**
    * Child Tickets (6-11)
    */
-  "ticketPanel:rows:1:ticketAmount": `${ZeroToTen}H`;
+  "ticketPanel:rows:1:ticketAmount": ChildTicketValues[number];
   /**
    * Disabled ticket (Taiwan only)
    */
-  "ticketPanel:rows:2:ticketAmount": `${ZeroToTen}W`;
+  "ticketPanel:rows:2:ticketAmount": DisabledTicketValues[number];
 
   /**
    * Elder ticket (Taiwan only)
    */
-  "ticketPanel:rows:3:ticketAmount": `${ZeroToTen}E`;
+  "ticketPanel:rows:3:ticketAmount": ElderTicketValues[number];
   /**
    * College student ticket (Taiwan only)
    */
-  "ticketPanel:rows:4:ticketAmount": `${ZeroToTen}P`;
+  "ticketPanel:rows:4:ticketAmount": CollegeTicketValues[number];
 };
 
 export type PostAvailableTrainsRequest = BookingOptions & {
@@ -91,7 +69,7 @@ export type PostAvailableTrainsRequest = BookingOptions & {
   "BookingS1Form:hf:0": "";
   bookingMethod: string;
   /**
-   * Format: "yyyy/mm/dd"
+   * @pattern "yyyy/mm/dd"
    */
   toTrainIDInputField: "";
   backTimeInputField: "";
@@ -113,13 +91,13 @@ export type PostSubmitTicketRequest = {
   diffOver: 1;
   /**
    * Taiwanese ID
-   * Format: [A-Z]([0-9]){9}
+   * @pattern /[A-Z](\d){9}/
    */
   dummyId: string;
   dummyPhone: string;
   email: string;
   /**
-   * Format: "radio[0-9]+"
+   * @pattern /radio\d+/
    */
   "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup": string;
   agree: "on";

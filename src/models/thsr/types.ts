@@ -1,40 +1,41 @@
 import type { ValueOf } from "next/dist/shared/lib/constants";
 
-import type { stations } from "./constants";
+import type { searchTypes, stationObjects } from "./constants";
 
 type DiscountType = {
   earlyBird: "e1b4c4d9-98d7-4c8c-9834-e1d2528750f1";
   collegeStudent: "68d9fc7b-7330-44c2-962a-74bc47d2ee8a";
 };
 
-export type StationValue = typeof stations[number][0];
-type StationText = typeof stations[number][1];
-
-export type Station = typeof stations[number];
-export type Stations = typeof stations;
+export type Stations = typeof stationObjects;
+export type Station = keyof Stations;
+export type StationName = ValueOf<Stations>["name"];
+export type StationValue = ValueOf<Stations>["value"];
+type StationNo = `0${Exclude<StationValue, 10 | 11 | 12>}` | "10" | "11" | "12";
 
 /**
  * S 為單程
  * R 為去回程
  */
-export type SearchType = "S" | "R";
+export type SearchType = keyof typeof searchTypes;
+export type SearchTypeValue = typeof searchTypes[SearchType]["value"];
 type Language = "TW";
 
 /**
- * Format: "yyyy/mm/dd"
+ * @pattern "yyyy/mm/dd"
  */
 type TSHRDate = string;
 
 /**
- * Format: "hh:mm"
+ * @pattern "hh:mm"
  */
 type TSHRTime = string;
 
 export type PostTHSRTimeTableRequest = {
   SearchType: SearchType;
   Lang: Language;
-  StartStation: StationValue;
-  EndStation: StationValue;
+  StartStation: Station;
+  EndStation: Station;
   OutWardSearchDate: TSHRDate;
   OutWardSearchTime: TSHRTime;
   ReturnSearchDate?: TSHRDate;
@@ -69,7 +70,7 @@ interface PriceTable {
 }
 
 /**
- *  Note:  will be "-" if unavailable.
+ *  Note: will be "-" if unavailable.
  */
 type Price = `$${number}` | "-";
 
@@ -109,8 +110,8 @@ interface TrainItem {
 }
 
 interface StationInfo {
-  StationNo: string;
-  StationName: StationText;
+  StationNo: StationNo;
+  StationName: StationName;
   DepartureTime: TSHRTime;
   Show: boolean;
   ColorClass: string;
@@ -121,21 +122,21 @@ interface Discount {
   Name: string;
   Value: DiscountText;
   /**
-   * Format in Hex Coded
+   * @pattern in Hex Coded
    */
   Color: string;
   Discount: DiscountValue;
 }
 
 interface Title {
-  StartStationName: StationText;
-  EndStationName: StationText;
+  StartStationName: StationName;
+  EndStationName: StationName;
   /**
-   * Format: "yyyy/mm/dd (日) 06:30"
+   * @pattern "yyyy/mm/dd (日) 06:30"
    */
   TitleSplit1: string;
   /**
-   * Format: "yyyy/mm/dd"
+   * @pattern "yyyy/mm/dd"
    */
   TitleSplit2: string;
 }

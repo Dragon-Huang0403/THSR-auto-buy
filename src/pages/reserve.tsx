@@ -12,8 +12,8 @@ const ReservePage: NextPage = () => {
         onClick={() => {
           mutation.mutate({
             bookingOptions: {
-              selectStartStation: 1,
-              selectDestinationStation: 2,
+              selectStartStation: "1",
+              selectDestinationStation: "2",
               "trainCon:trainRadioGroup": 0,
               "tripCon:typesoftrip": 0,
               "seatCon:seatRadioGroup": 0,

@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import type { SearchBarParams } from "../components/SearchBar";
 import { SearchBar } from "../components/SearchBar";
 import { TimeTable } from "../components/TimeTable";
-import { stations } from "../models/THSRTimeTable";
+import { stations } from "../models/thsr";
 import { getMinSearchTime } from "../utils/helper";
 import { trpc } from "../utils/trpc";
 
@@ -31,8 +31,8 @@ const SearchPage: NextPage = () => {
         onSubmit={(timeTableParams) => {
           departureTableMutation.mutate({
             ...timeTableParams,
-            StartStation: timeTableParams.StartStation[0],
-            EndStation: timeTableParams.EndStation[0],
+            StartStation: timeTableParams.StartStation,
+            EndStation: timeTableParams.EndStation,
           });
         }}
       />

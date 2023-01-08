@@ -7,7 +7,8 @@ import type {
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
-} from "./utils/bookingRequestSchema";
+} from "~/src/models/thsr";
+
 import { getCaptchaResult } from "./utils/captchaHelpers";
 import {
   availableTrainRequestFiller,

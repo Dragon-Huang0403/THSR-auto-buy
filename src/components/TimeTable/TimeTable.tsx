@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { TimeTable as TimeTableData } from "~/src/models/THSRTimeTable";
+import type { TimeTable as TimeTableData } from "~/src/models/thsr";
 
 interface TimeTableProps {
   value: TimeTableData;
