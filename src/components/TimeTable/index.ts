@@ -1,1 +1,1 @@
-export * from "./TimeTable";
+export * from './TimeTable';

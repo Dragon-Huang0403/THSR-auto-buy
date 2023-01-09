@@ -1,5 +1,5 @@
-import type { Got } from "got";
-import parse from "node-html-parser";
+import type { Got } from 'got';
+import parse from 'node-html-parser';
 
 import type {
   BookingByDateOptions,
@@ -9,9 +9,9 @@ import type {
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
-} from "~/src/models/thsr";
+} from '~/src/models/thsr';
 
-import { getCaptchaResult } from "./utils/captchaHelpers";
+import { getCaptchaResult } from './utils/captchaHelpers';
 import {
   availableTrainRequestFiller,
   bookingByTainIdRequestFiller,
@@ -19,18 +19,18 @@ import {
   getClient,
   submitTicketRequestFiller,
   thsrUrls,
-} from "./utils/config";
+} from './utils/config';
 import {
   getPassengerAmount,
   parsePageErrors,
   parsePurchaseResult,
   parseTrains,
-} from "./utils/parseHelper";
+} from './utils/parseHelper';
 
 export async function bookingByDateFlow(
   bookingOptions: BookingByDateOptions,
   buyerInfo: BuyerInfo,
-  buyNthTrainItem = 0
+  buyNthTrainItem = 0,
 ) {
   const client = getClient();
   const { bookingMethods, captchaImageUrl } = await visitBookingPage(client);
@@ -41,23 +41,23 @@ export async function bookingByDateFlow(
     {
       ...bookingOptions,
       ...availableTrainRequestFiller,
-      "homeCaptcha:securityCode": captchaResult,
+      'homeCaptcha:securityCode': captchaResult,
       bookingMethod: bookingMethods[0],
     },
-    buyNthTrainItem
+    buyNthTrainItem,
   );
 
   const memberValue = await confirmTrain(client, {
     ...confirmTrainRequestFiller,
-    "TrainQueryDataViewPanel:TrainGroup": trainValue,
+    'TrainQueryDataViewPanel:TrainGroup': trainValue,
   });
 
   const purchaseResult = await submitTicket(client, {
     ...submitTicketRequestFiller,
     ...buyerInfo,
-    "wicket:interface": ":2:BookingS3Form::IFormSubmitListener",
+    'wicket:interface': ':2:BookingS3Form::IFormSubmitListener',
     passengerCount: getPassengerAmount(bookingOptions),
-    "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup":
+    'TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup':
       memberValue,
   });
 
@@ -66,7 +66,7 @@ export async function bookingByDateFlow(
 
 export async function bookingByTrainNoFlow(
   bookingOptions: BookingByTrainNoOptions,
-  buyerInfo: BuyerInfo
+  buyerInfo: BuyerInfo,
 ) {
   const client = getClient();
   const { bookingMethods, captchaImageUrl } = await visitBookingPage(client);
@@ -76,15 +76,15 @@ export async function bookingByTrainNoFlow(
     ...bookingByTainIdRequestFiller,
     ...bookingOptions,
     bookingMethod: bookingMethods[1],
-    "homeCaptcha:securityCode": captchaResult,
+    'homeCaptcha:securityCode': captchaResult,
   });
 
   const purchaseResult = await submitTicket(client, {
     ...submitTicketRequestFiller,
     ...buyerInfo,
-    "wicket:interface": ":1:BookingS3Form::IFormSubmitListener",
+    'wicket:interface': ':1:BookingS3Form::IFormSubmitListener',
     passengerCount: getPassengerAmount(bookingOptions),
-    "TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup":
+    'TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup':
       memberValue,
   });
 
@@ -97,7 +97,7 @@ async function visitBookingPage(client: Got) {
 
   const pageErrors = parsePageErrors(page);
   if (pageErrors) {
-    throw new Error(pageErrors.join(". "));
+    throw new Error(pageErrors.join('. '));
   }
 
   /**
@@ -105,16 +105,16 @@ async function visitBookingPage(client: Got) {
    * bookingMethods[1] = search-by-trainNo
    */
   const bookingMethods = page
-    .querySelectorAll("[name=bookingMethod]")
-    .map((element) => element.getAttribute("value")) as [string, string];
+    .querySelectorAll('[name=bookingMethod]')
+    .map((element) => element.getAttribute('value')) as [string, string];
 
   if (bookingMethods.length !== 2) {
     throw new Error("Can't find booking method");
   }
 
   let captchaImageUrl = page
-    .getElementById("BookingS1Form_homeCaptcha_passCode")
-    ?.getAttribute("src");
+    .getElementById('BookingS1Form_homeCaptcha_passCode')
+    ?.getAttribute('src');
   if (!captchaImageUrl) {
     throw new Error("Can't find captcha image url");
   }
@@ -130,7 +130,7 @@ async function visitBookingPage(client: Got) {
 async function getAvailableTrains(
   client: Got,
   availableTrainRequest: PostAvailableTrainsRequest,
-  buyNthTrainItem: number
+  buyNthTrainItem: number,
 ) {
   const { body } = await client.post(thsrUrls.bookingPage, {
     searchParams: availableTrainRequest,
@@ -139,14 +139,14 @@ async function getAvailableTrains(
   const page = parse(body);
   const pageErrors = parsePageErrors(page);
   if (pageErrors) {
-    throw new Error(pageErrors.join(". "));
+    throw new Error(pageErrors.join('. '));
   }
 
   const trainItems = parseTrains(page);
 
   const trainValue = trainItems[buyNthTrainItem]?.value;
   if (!trainValue) {
-    throw new Error("No Trains Available");
+    throw new Error('No Trains Available');
   }
 
   return trainValue;
@@ -154,7 +154,7 @@ async function getAvailableTrains(
 
 async function confirmTrain(
   client: Got,
-  confirmTrainRequest: PostConfirmTrainRequest | BookingByTrainNoRequest
+  confirmTrainRequest: PostConfirmTrainRequest | BookingByTrainNoRequest,
 ) {
   const { body } = await client.post(thsrUrls.bookingPage, {
     searchParams: confirmTrainRequest,
@@ -162,14 +162,14 @@ async function confirmTrain(
   const page = parse(body);
   const pageErrors = parsePageErrors(page);
   if (pageErrors) {
-    throw new Error(pageErrors.join(". "));
+    throw new Error(pageErrors.join('. '));
   }
 
   const memberValue = page
     .querySelector(
-      "input[name='TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup']"
+      "input[name='TicketMemberSystemInputPanel:TakerMemberSystemDataView:memberSystemRadioGroup']",
     )
-    ?.getAttribute("value");
+    ?.getAttribute('value');
 
   if (!memberValue) {
     throw new Error("Can Not Get Confirm Train's Member Input");
@@ -185,7 +185,7 @@ async function submitTicket(client: Got, request: PostSubmitTicketRequest) {
   const page = parse(body);
   const pageErrors = parsePageErrors(page);
   if (pageErrors) {
-    throw new Error(pageErrors.join(". "));
+    throw new Error(pageErrors.join('. '));
   }
   const purchaseResult = parsePurchaseResult(page);
 

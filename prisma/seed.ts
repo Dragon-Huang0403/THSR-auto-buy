@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
-import { getRandomTaiwanId } from "~/src/utils/taiwanIdGenerator";
+import { getRandomTaiwanId } from '~/src/utils/taiwanIdGenerator';
 const prisma = new PrismaClient();
 
 function getDateWithNDaysLater(days: number) {
@@ -13,8 +13,8 @@ async function main() {
 
   const dummyTickets = await prisma.ticketsByDate.create({
     data: {
-      selectStartStation: "1",
-      selectDestinationStation: "10",
+      selectStartStation: '1',
+      selectDestinationStation: '10',
       trainRadioGroup: 0,
       typesoftrip: 0,
       seatRadioGroup: 0,
@@ -25,10 +25,10 @@ async function main() {
       elderTicketValue: 0,
       collegeTicketValue: 0,
       dummyId: getRandomTaiwanId(),
-      dummyPhone: "",
-      email: "",
+      dummyPhone: '',
+      email: '',
       buyNthTrainItem: 0,
-      toTimeTable: "1000A",
+      toTimeTable: '1000A',
     },
   });
   console.log(dummyTickets);

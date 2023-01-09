@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { prisma } from "~/src/server/db/client";
+import { prisma } from '~/src/server/db/client';
 
 const ticket = async (req: NextApiRequest, res: NextApiResponse) => {
   const tickets = await prisma.ticketsByDate.findMany();

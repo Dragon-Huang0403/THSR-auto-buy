@@ -1,4 +1,4 @@
-import type { ValueOf } from "next/dist/shared/lib/constants";
+import type { ValueOf } from 'next/dist/shared/lib/constants';
 
 import type {
   adultTicketValues,
@@ -9,26 +9,26 @@ import type {
   searchTypes,
   stationObjects,
   toTimeTableValues,
-} from "./constants";
+} from './constants';
 
 type DiscountType = {
-  earlyBird: "e1b4c4d9-98d7-4c8c-9834-e1d2528750f1";
-  collegeStudent: "68d9fc7b-7330-44c2-962a-74bc47d2ee8a";
+  earlyBird: 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
+  collegeStudent: '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
 };
 
 export type Stations = typeof stationObjects;
 export type Station = keyof Stations;
-export type StationName = ValueOf<Stations>["name"];
-export type StationValue = ValueOf<Stations>["value"];
-type StationNo = `0${Exclude<StationValue, 10 | 11 | 12>}` | "10" | "11" | "12";
+export type StationName = ValueOf<Stations>['name'];
+export type StationValue = ValueOf<Stations>['value'];
+type StationNo = `0${Exclude<StationValue, 10 | 11 | 12>}` | '10' | '11' | '12';
 
 /**
  * S 為單程
  * R 為去回程
  */
 export type SearchType = keyof typeof searchTypes;
-export type SearchTypeValue = typeof searchTypes[SearchType]["value"];
-type Language = "TW";
+export type SearchTypeValue = typeof searchTypes[SearchType]['value'];
+type Language = 'TW';
 
 /**
  * @pattern "yyyy/mm/dd"
@@ -81,7 +81,7 @@ interface PriceTable {
 /**
  *  Note: will be "-" if unavailable.
  */
-type Price = `$${number}` | "-";
+type Price = `$${number}` | '-';
 
 type DiscountValue = `${number}`;
 type DiscountText = `${number}折`;

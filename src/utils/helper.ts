@@ -1,8 +1,8 @@
-import { selectableTime } from "./constants";
-import type { DropFirstFewInTuple, EnumerateStringArray } from "./typeHelper";
+import { selectableTime } from './constants';
+import type { DropFirstFewInTuple, EnumerateStringArray } from './typeHelper';
 
 export function padTo2Digit(num: number) {
-  return num.toString().padStart(2, "0");
+  return num.toString().padStart(2, '0');
 }
 
 export function getFormattedDate(date: Date) {
@@ -10,12 +10,12 @@ export function getFormattedDate(date: Date) {
     date.getFullYear(),
     padTo2Digit(date.getMonth() + 1),
     padTo2Digit(date.getDate()),
-  ].join("/");
+  ].join('/');
 }
 
 export function getFormattedTime(date: Date) {
   return [padTo2Digit(date.getHours()), padTo2Digit(date.getMinutes())].join(
-    ":"
+    ':',
   );
 }
 
@@ -26,7 +26,7 @@ export function getMinSearchTime() {
   const findLatestTime = selectableTime.find(
     (time) =>
       (time[0] === now.getHours() && time[1] >= now.getMinutes()) ||
-      time[0] > now.getHours()
+      time[0] > now.getHours(),
   );
 
   if (findLatestTime) {
@@ -39,8 +39,8 @@ export function getMinSearchTime() {
 export function intRangeArray<
   Min extends number,
   Max extends number,
-  PostFix extends string = ""
->(min: Min, max: Max, postFix: PostFix = "" as PostFix) {
+  PostFix extends string = '',
+>(min: Min, max: Max, postFix: PostFix = '' as PostFix) {
   const arr = [];
   for (let i = min; i < max; i++) {
     arr.push(`${i}${postFix}`);

@@ -1,17 +1,17 @@
-import type { NextPage } from "next";
+import type { NextPage } from 'next';
 
-import type { SearchBarParams } from "../components/SearchBar";
-import { SearchBar } from "../components/SearchBar";
-import { TimeTable } from "../components/TimeTable";
-import { stations } from "../models/thsr";
-import { getMinSearchTime } from "../utils/helper";
-import { trpc } from "../utils/trpc";
+import type { SearchBarParams } from '../components/SearchBar';
+import { SearchBar } from '../components/SearchBar';
+import { TimeTable } from '../components/TimeTable';
+import { stations } from '../models/thsr';
+import { getMinSearchTime } from '../utils/helper';
+import { trpc } from '../utils/trpc';
 
 const minSearchTime = getMinSearchTime();
 
 const initialTimeTableParamsData: SearchBarParams = {
-  SearchType: "S",
-  Lang: "TW",
+  SearchType: 'S',
+  Lang: 'TW',
   StartStation: stations[0],
   EndStation: stations[11],
   OutWardSearchDate: minSearchTime,

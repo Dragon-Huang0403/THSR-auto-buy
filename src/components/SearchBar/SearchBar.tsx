@@ -1,19 +1,17 @@
-import "react-calendar/dist/Calendar.css";
+import 'react-calendar/dist/Calendar.css';
 
-import React, { useState } from "react";
-import Calendar from "react-calendar";
+import React, { useState } from 'react';
+import Calendar from 'react-calendar';
 
-import type { Station } from "~/src/models/thsr";
-import { stationObjects, stations } from "~/src/models/thsr";
-import { selectableTime } from "~/src/utils/constants";
-import { getFormattedDate, padTo2Digit } from "~/src/utils/helper";
-import type { RouterInputs } from "~/src/utils/trpc";
-
-import { Select } from "../Select";
+import type { Station } from '~/src/models/thsr';
+import { stationObjects, stations } from '~/src/models/thsr';
+import { selectableTime } from '~/src/utils/constants';
+import { getFormattedDate, padTo2Digit } from '~/src/utils/helper';
+import type { RouterInputs } from '~/src/utils/trpc';
 
 export type SearchBarParams = Omit<
-  RouterInputs["search"]["timeTable"],
-  "StartStation" | "EndStation"
+  RouterInputs['search']['timeTable'],
+  'StartStation' | 'EndStation'
 > & {
   StartStation: Station;
   EndStation: Station;
@@ -48,7 +46,7 @@ export function SearchBar({
         onSubmit(searchBarParams);
       }}
     >
-      <Select
+      {/* <Select
         label="啟程站"
         value={{
           label: stationObjects[searchBarParams.StartStation].name,
@@ -64,7 +62,7 @@ export function SearchBar({
           value: station,
           label: stationObjects[station].name,
         }))}
-      />
+      /> */}
       <div>
         <button
           onClick={() => {
@@ -78,7 +76,7 @@ export function SearchBar({
           交換
         </button>
       </div>
-      <Select
+      {/* <Select
         label="到達站"
         value={{
           label: stationObjects[searchBarParams.EndStation].name,
@@ -98,7 +96,7 @@ export function SearchBar({
       <Select
         label="選擇時間"
         value={{
-          label: selectedTime.map((item) => padTo2Digit(item)).join(":"),
+          label: selectedTime.map((item) => padTo2Digit(item)).join(':'),
           value: selectedTime,
         }}
         onChange={(newOption) => {
@@ -119,9 +117,9 @@ export function SearchBar({
           })
           .map((time) => ({
             value: time,
-            label: time.map((item) => padTo2Digit(item)).join(":"),
+            label: time.map((item) => padTo2Digit(item)).join(':'),
           }))}
-      />
+      /> */}
       <div className="relative">
         <div>{getFormattedDate(OutWardSearchDate)}</div>
         <button

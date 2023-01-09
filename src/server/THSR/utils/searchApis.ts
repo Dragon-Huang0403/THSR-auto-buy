@@ -1,11 +1,11 @@
-import got from "got";
+import got from 'got';
 
 import type {
   PostTHSRTimeTableRequest,
   PostTHSRTimeTableResponse,
-} from "~/src/models/thsr";
+} from '~/src/models/thsr';
 
-import { thsrUrls } from "./config";
+import { thsrUrls } from './config';
 
 export async function postTHSRTimeTable(request: PostTHSRTimeTableRequest) {
   const response = (await got
@@ -13,7 +13,7 @@ export async function postTHSRTimeTable(request: PostTHSRTimeTableRequest) {
     .json()) as PostTHSRTimeTableResponse;
 
   if (!response.success) {
-    throw new Error("Get TimeTable Data Failed");
+    throw new Error('Get TimeTable Data Failed');
   }
   return response.data;
 }
