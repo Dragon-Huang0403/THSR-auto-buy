@@ -10,8 +10,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model TicketsByDate {
+  id                       String         @id @default(cuid())
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  selectStartStation       String
+  selectDestinationStation String
+  toTimeInputField         DateTime
+  // 0: Standard Car
+  // 1: Business Car
+  trainRadioGroup          Int
+  // 0: No Required
+  // 1: Window Seat
+  // 2: Aisle Seat
+  seatRadioGroup           Int
+  // 0: Single Trip
+  // 1: Round Trip
+  typesoftrip              Int
+  adultTicketValue         Int
+  childTicketValue         Int
+  disabledTicketValue      Int
+  elderTicketValue         Int
+  collegeTicketValue       Int
+  dummyId                  String
+  dummyPhone               String
+  email                    String
+  // Start with zero
+  buyNthTrainItem          Int?
+  toTrainIDInputField      String?
+  toTimeTable              String?
+  ticketResults            TicketResult[]
+}
+
+model TicketResult {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  ticketId        String?       @unique
+  errorMessage    String?
+  ticketsByDateId String
+  TicketsByDate   TicketsByDate @relation(fields: [ticketsByDateId], references: [id])
 }
