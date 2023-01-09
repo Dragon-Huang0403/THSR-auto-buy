@@ -18,7 +18,7 @@ const ReservePage: NextPage = () => {
               "trainCon:trainRadioGroup": 0,
               "tripCon:typesoftrip": 0,
               "seatCon:seatRadioGroup": 0,
-              toTimeInputField: "2023/01/13",
+              toTimeInputField: new Date("2023/01/13"),
               toTimeTable: "1000A",
               "ticketPanel:rows:0:ticketAmount": "1F",
               "ticketPanel:rows:1:ticketAmount": "0H",

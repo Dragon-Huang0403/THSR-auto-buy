@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -9,12 +10,14 @@ import {
   stationValues,
   toTimeTableValues,
 } from "~/src/models/thsr/constants";
+import { getFormattedDate } from "~/src/utils/helper";
 
 import {
   bookingByDateFlow,
   bookingByTrainNoFlow,
 } from "../../THSR/bookingFlow";
 import { ticketHistoryFlow } from "../../THSR/ticketHistoryFlow";
+import { getAvailableDate } from "../../THSR/utils/searchApis";
 import { publicProcedure, router } from "../trpc";
 
 export const bookRouter = router({
@@ -30,7 +33,7 @@ export const bookRouter = router({
             .literal(0)
             .or(z.literal(1))
             .or(z.literal(2)),
-          toTimeInputField: z.string().regex(/^\d{4}\/\d{2}\/\d{2}$/),
+          toTimeInputField: z.date(),
           toTimeTable: z.enum(toTimeTableValues),
           "ticketPanel:rows:0:ticketAmount": z.enum(adultTicketValues),
           "ticketPanel:rows:1:ticketAmount": z.enum(childTicketValues),
@@ -48,15 +51,27 @@ export const bookRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const minBookingDate = await getAvailableDate();
+      const formattedDate = getFormattedDate(
+        input.bookingOptions.toTimeInputField
+      );
+      if (input.bookingOptions.toTimeInputField < minBookingDate) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `此時間 ${formattedDate} 台灣高鐵已開放購票，請自行上網進行購買`,
+        });
+      }
+      const bookingOptions = {
+        ...input.bookingOptions,
+        toTimeInputField: formattedDate,
+      };
+
       let result;
       if (input.bookingOptions.toTrainIDInputField) {
-        result = await bookingByTrainNoFlow(
-          input.bookingOptions,
-          input.buyerInfo
-        );
+        result = await bookingByTrainNoFlow(bookingOptions, input.buyerInfo);
       } else {
         result = await bookingByDateFlow(
-          input.bookingOptions,
+          bookingOptions,
           input.buyerInfo,
           input.buyNthTrainItem
         );
