@@ -4,6 +4,7 @@ import { trpc } from "../utils/trpc";
 
 const ReservePage: NextPage = () => {
   const mutation = trpc["book"].ticket.useMutation();
+  const history = trpc["book"].search.useMutation();
   console.log(mutation.data);
 
   return (
@@ -35,6 +36,17 @@ const ReservePage: NextPage = () => {
         }}
       >
         Click to book
+      </button>
+      <button
+        onClick={() => {
+          history.mutate({
+            typesofid: 0,
+            rocId: "A123456789",
+            orderId: "03391433",
+          });
+        }}
+      >
+        Click to search
       </button>
     </div>
   );

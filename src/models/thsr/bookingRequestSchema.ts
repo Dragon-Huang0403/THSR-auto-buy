@@ -125,3 +125,17 @@ export type BookingByTrainNoRequest = {
   toTimeTable: "";
   "homeCaptcha:securityCode": string;
 } & BookingByTrainNoOptions;
+
+export type SearchBookedTicketRequest = {
+  "wicket:interface": ":0:HistoryForm::IFormSubmitListener";
+  "HistoryForm:hf:0": "";
+  /**
+   * 0: 身分證字號
+   * 1: 護照/居留證/入出境許可證號碼
+   */
+  typesofid: 0 | 1;
+  rocId: string;
+  orderId: string;
+  "divCaptcha:securityCode": string;
+  SubmitButton: "查詢";
+};

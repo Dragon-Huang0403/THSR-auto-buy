@@ -8,6 +8,7 @@ import type {
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
+  SearchBookedTicketRequest,
 } from "~/src/models/thsr";
 
 const searchBaseUrl = "https://www.thsrc.com.tw";
@@ -26,7 +27,6 @@ const defaultHeaders = {
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
   Connection: "keep-alive",
   "Accept-Language": "zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-  "Content-Type": "application/x-www-form-urlencoded",
 };
 
 export const availableTrainRequestFiller: Omit<
@@ -87,3 +87,16 @@ export function getClient() {
   });
   return client;
 }
+
+export const searchBookedTicketRequestFiller: Pick<
+  SearchBookedTicketRequest,
+  "wicket:interface" | "HistoryForm:hf:0" | "SubmitButton"
+> = {
+  "wicket:interface": ":0:HistoryForm::IFormSubmitListener",
+  "HistoryForm:hf:0": "",
+  SubmitButton: "查詢",
+};
+
+export const visitHistoryPageResultFiller = {
+  "wicket:bookmarkablePage": ":tw.com.mitac.webapp.thsr.viewer.History",
+} as const;

@@ -14,6 +14,7 @@ import {
   bookingByDateFlow,
   bookingByTrainNoFlow,
 } from "../../THSR/bookingFlow";
+import { ticketHistoryFlow } from "../../THSR/ticketHistoryFlow";
 import { publicProcedure, router } from "../trpc";
 
 export const bookRouter = router({
@@ -64,5 +65,17 @@ export const bookRouter = router({
       console.log({ result });
 
       return result;
+    }),
+  search: publicProcedure
+    .input(
+      z.object({
+        typesofid: z.union([z.literal(0), z.literal(1)]),
+        rocId: z.string(),
+        orderId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await ticketHistoryFlow(input);
+      console.log(result);
     }),
 });
