@@ -4,7 +4,6 @@ import { trpc } from '../utils/trpc';
 const ReservePage = () => {
   const mutation = trpc['book'].ticket.useMutation();
   const history = trpc['book'].search.useMutation();
-  console.log(mutation.data);
 
   return (
     <div>
