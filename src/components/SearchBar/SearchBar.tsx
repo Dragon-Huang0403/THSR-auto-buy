@@ -1,12 +1,13 @@
 import 'react-calendar/dist/Calendar.css';
 
+import { Box, Button } from '@mui/material';
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 
 import { Select } from '~/src/components/Select';
 import type { Station } from '~/src/models/thsr';
 import { stationObjects, stations } from '~/src/models/thsr';
-import { selectableTime } from '~/src/utils/constants';
+import { selectableTime as _selectableTime } from '~/src/utils/constants';
 import { getFormattedDate, padTo2Digit } from '~/src/utils/helper';
 import type { RouterInputs } from '~/src/utils/trpc';
 
@@ -39,6 +40,12 @@ export function SearchBar({
     OutWardSearchDate.getHours(),
     OutWardSearchDate.getMinutes(),
   ];
+  const selectableTime = _selectableTime.filter((time) => {
+    const date = new Date(OutWardSearchDate);
+    date.setHours(time[0]);
+    date.setMinutes(time[1]);
+    return minSearchDate ? date >= minSearchDate : true;
+  });
 
   return (
     <form
@@ -64,8 +71,8 @@ export function SearchBar({
           label: stationObjects[station].name,
         }))}
       />
-      <div>
-        <button
+      <Box>
+        <Button
           onClick={() => {
             setSearchBarParams((prev) => ({
               ...prev,
@@ -75,8 +82,8 @@ export function SearchBar({
           }}
         >
           交換
-        </button>
-      </div>
+        </Button>
+      </Box>
       <Select
         label="到達站"
         value={{
@@ -109,28 +116,21 @@ export function SearchBar({
             OutWardSearchDate: newDate,
           }));
         }}
-        options={selectableTime
-          .filter((time) => {
-            const date = new Date(OutWardSearchDate);
-            date.setHours(time[0]);
-            date.setMinutes(time[1]);
-            return minSearchDate ? date > minSearchDate : true;
-          })
-          .map((time) => ({
-            value: time,
-            label: time.map((item) => padTo2Digit(item)).join(':'),
-          }))}
+        options={selectableTime.map((time) => ({
+          value: time,
+          label: time.map((item) => padTo2Digit(item)).join(':'),
+        }))}
       />
-      <div className="relative">
-        <div>{getFormattedDate(OutWardSearchDate)}</div>
-        <button
+      <Box className="relative">
+        <Box>{getFormattedDate(OutWardSearchDate).join('/')}</Box>
+        <Button
           type="button"
           onClick={() => {
             setIsCalendarShown(true);
           }}
         >
           選擇日期
-        </button>
+        </Button>
         {isCalendarShown && (
           <Calendar
             value={OutWardSearchDate}
@@ -151,8 +151,8 @@ export function SearchBar({
             next2Label={null}
           />
         )}
-      </div>
-      <button type="submit">查詢</button>
+      </Box>
+      <Button type="submit">查詢</Button>
     </form>
   );
 }
