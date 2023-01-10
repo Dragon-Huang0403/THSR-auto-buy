@@ -19,10 +19,11 @@ export async function postTHSRTimeTable(request: PostTHSRTimeTableRequest) {
 }
 
 export async function getAvailableDate() {
+  const now = new Date();
   /**
    * @returns string: yyyy/mm/dd
    */
-  const { body } = await got.get(thsrUrls.availableDate);
+  const { body } = await got.get(thsrUrls.availableDate(now));
   const date = new Date(body);
   date.setHours(23);
   date.setMinutes(59);

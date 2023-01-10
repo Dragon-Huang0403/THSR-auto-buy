@@ -54,7 +54,7 @@ export const bookRouter = router({
       const minBookingDate = await getAvailableDate();
       const formattedDate = getFormattedDate(
         input.bookingOptions.toTimeInputField,
-      );
+      ).join('/');
       if (input.bookingOptions.toTimeInputField < minBookingDate) {
         throw new TRPCError({
           code: 'BAD_REQUEST',

@@ -10,7 +10,7 @@ export function getFormattedDate(date: Date) {
     date.getFullYear(),
     padTo2Digit(date.getMonth() + 1),
     padTo2Digit(date.getDate()),
-  ].join('/');
+  ];
 }
 
 export function getFormattedTime(date: Date) {

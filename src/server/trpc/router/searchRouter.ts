@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { stations } from '~/src/models/thsr';
+import { discountType, stations } from '~/src/models/thsr';
 import {
   getAvailableDate,
   postTHSRTimeTable,
@@ -60,8 +60,11 @@ export const searchRouter = router({
           Lang: input.Lang,
           StartStation: input.StartStation,
           EndStation: input.EndStation,
-          OutWardSearchDate: getFormattedDate(input.OutWardSearchDate),
+          OutWardSearchDate: getFormattedDate(input.OutWardSearchDate).join(
+            '/',
+          ),
           OutWardSearchTime: getFormattedTime(input.OutWardSearchDate),
+          DiscountType: discountType.all,
         });
       } catch (e) {
         throw new TRPCError({
@@ -81,5 +84,7 @@ export const searchRouter = router({
       };
       return result;
     }),
-  availableDate: publicProcedure.query(() => getAvailableDate()),
+  availableDate: publicProcedure
+    .output(z.date())
+    .query(() => getAvailableDate()),
 });

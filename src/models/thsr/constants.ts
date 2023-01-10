@@ -83,3 +83,11 @@ export const toTimeTableValues = [
   '1100P',
   '1130P',
 ] as const;
+
+const earlyBird = 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
+const collegeStudent = '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
+export const discountType = {
+  earlyBird,
+  collegeStudent,
+  all: `${earlyBird},${collegeStudent}`,
+} as const;

@@ -10,13 +10,15 @@ import type {
   PostSubmitTicketRequest,
   SearchBookedTicketRequest,
 } from '~/src/models/thsr';
+import { getFormattedDate } from '~/src/utils/helper';
 
 const searchBaseUrl = 'https://www.thsrc.com.tw';
 const baseUrl = 'https://irs.thsrc.com.tw';
 export const thsrUrls = {
   baseUrl: baseUrl,
   timeTableSearch: `${searchBaseUrl}/TimeTable/Search`,
-  availableDate: `${searchBaseUrl}/RawData/EAIIRS_20230102.xml`,
+  availableDate: (date: Date) =>
+    `${searchBaseUrl}/RawData/EAIIRS_${getFormattedDate(date).join('')}.xml`,
   bookingPage: `${baseUrl}/IMINT/`,
 };
 

@@ -5,16 +5,14 @@ import type {
   childTicketValues,
   collegeTicketValues,
   disabledTicketValues,
+  discountType,
   elderTicketValues,
   searchTypes,
   stationObjects,
   toTimeTableValues,
 } from './constants';
 
-type DiscountType = {
-  earlyBird: 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
-  collegeStudent: '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
-};
+type DiscountType = ValueOf<typeof discountType>;
 
 export type Stations = typeof stationObjects;
 export type Station = keyof Stations;
@@ -49,7 +47,7 @@ export type PostTHSRTimeTableRequest = {
   OutWardSearchTime: TSHRTime;
   ReturnSearchDate?: TSHRDate;
   ReturnSearchTime?: TSHRTime;
-  DiscountType?: ValueOf<DiscountType>;
+  DiscountType?: DiscountType;
 };
 
 export type PostTHSRTimeTableResponse =
