@@ -3,6 +3,7 @@ import 'react-calendar/dist/Calendar.css';
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 
+import { Select } from '~/src/components/Select';
 import type { Station } from '~/src/models/thsr';
 import { stationObjects, stations } from '~/src/models/thsr';
 import { selectableTime } from '~/src/utils/constants';
@@ -46,7 +47,7 @@ export function SearchBar({
         onSubmit(searchBarParams);
       }}
     >
-      {/* <Select
+      <Select
         label="啟程站"
         value={{
           label: stationObjects[searchBarParams.StartStation].name,
@@ -62,7 +63,7 @@ export function SearchBar({
           value: station,
           label: stationObjects[station].name,
         }))}
-      /> */}
+      />
       <div>
         <button
           onClick={() => {
@@ -76,7 +77,7 @@ export function SearchBar({
           交換
         </button>
       </div>
-      {/* <Select
+      <Select
         label="到達站"
         value={{
           label: stationObjects[searchBarParams.EndStation].name,
@@ -119,7 +120,7 @@ export function SearchBar({
             value: time,
             label: time.map((item) => padTo2Digit(item)).join(':'),
           }))}
-      /> */}
+      />
       <div className="relative">
         <div>{getFormattedDate(OutWardSearchDate)}</div>
         <button
