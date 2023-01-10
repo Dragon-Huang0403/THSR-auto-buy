@@ -1,13 +1,56 @@
-import { type NextPage } from 'next';
-import Link from 'next/link';
+import { getLayout } from '../layouts/Layout';
+import { trpc } from '../utils/trpc';
 
-const Home: NextPage = () => {
+const ReservePage = () => {
+  const mutation = trpc['book'].ticket.useMutation();
+  const history = trpc['book'].search.useMutation();
+  console.log(mutation.data);
+
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-3">
-      <Link href="/search">查詢已開放購買班次</Link>
-      <Link href="/reserve">預約購買未開放購買班次</Link>
+    <div>
+      <button
+        onClick={() => {
+          mutation.mutate({
+            bookingOptions: {
+              selectStartStation: '1',
+              selectDestinationStation: '2',
+              'trainCon:trainRadioGroup': 0,
+              'tripCon:typesoftrip': 0,
+              'seatCon:seatRadioGroup': 0,
+              toTimeInputField: new Date('2023/01/13'),
+              toTimeTable: '1000A',
+              'ticketPanel:rows:0:ticketAmount': '1F',
+              'ticketPanel:rows:1:ticketAmount': '0H',
+              'ticketPanel:rows:2:ticketAmount': '0W',
+              'ticketPanel:rows:3:ticketAmount': '0E',
+              'ticketPanel:rows:4:ticketAmount': '0P',
+              toTrainIDInputField: '0609',
+            },
+            buyerInfo: {
+              dummyId: 'A123456789',
+              dummyPhone: '',
+              email: '',
+            },
+          });
+        }}
+      >
+        Click to book
+      </button>
+      <button
+        onClick={() => {
+          history.mutate({
+            typesofid: 0,
+            rocId: 'A123456789',
+            orderId: '03391433',
+          });
+        }}
+      >
+        Click to search
+      </button>
     </div>
   );
 };
 
-export default Home;
+ReservePage.getLayout = getLayout;
+
+export default ReservePage;
