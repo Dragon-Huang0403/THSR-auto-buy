@@ -20,8 +20,8 @@ import { ticketHistoryFlow } from '../../THSR/ticketHistoryFlow';
 import { getAvailableDate } from '../../THSR/utils/searchApis';
 import { publicProcedure, router } from '../trpc';
 
-export const bookRouter = router({
-  ticket: publicProcedure
+export const ticketRouter = router({
+  reserve: publicProcedure
     .input(
       z.object({
         bookingOptions: z.object({
@@ -81,7 +81,7 @@ export const bookRouter = router({
 
       return result;
     }),
-  search: publicProcedure
+  history: publicProcedure
     .input(
       z.object({
         typesofid: z.union([z.literal(0), z.literal(1)]),

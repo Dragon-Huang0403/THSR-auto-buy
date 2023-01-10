@@ -2,8 +2,8 @@ import { getLayout } from '../layouts/Layout';
 import { trpc } from '../utils/trpc';
 
 const ReservePage = () => {
-  const mutation = trpc['book'].ticket.useMutation();
-  const history = trpc['book'].search.useMutation();
+  const mutation = trpc['ticket'].reserve.useMutation();
+  const history = trpc['ticket'].history.useMutation();
 
   return (
     <div>

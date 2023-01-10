@@ -12,7 +12,7 @@ import { getFormattedDate, padTo2Digit } from '~/src/utils/helper';
 import type { RouterInputs } from '~/src/utils/trpc';
 
 export type SearchBarParams = Omit<
-  RouterInputs['search']['timeTable'],
+  RouterInputs['time']['search'],
   'StartStation' | 'EndStation'
 > & {
   StartStation: Station;
