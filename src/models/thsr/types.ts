@@ -99,7 +99,7 @@ export interface TimeTable {
 
 type NonReservedCar = `${number}-${number}`;
 
-interface TrainItem {
+export interface TrainItem {
   TrainNumber: `${number}`;
   DepartureTime: TSHRTime;
   DestinationTime: TSHRTime;
