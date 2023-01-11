@@ -1,30 +1,21 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import type { NextPage } from 'next';
-import type { AppProps } from 'next/app';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { type AppType } from 'next/app';
-import type { ReactElement, ReactNode } from 'react';
 
+import { getLayout } from '~/src/layouts/Layout';
 import { theme } from '~/src/styles/theme';
 
 import { trpc } from '../utils/trpc';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
-};
-
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
-
-const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
-  const getLayout = Component.getLayout ?? ((page) => page);
-
+const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        {getLayout(<Component {...pageProps} />)}
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          {getLayout(<Component {...pageProps} />)}
+        </LocalizationProvider>
       </ThemeProvider>
     </>
   );

@@ -1,4 +1,3 @@
-import { getLayout } from '../layouts/Layout';
 import { trpc } from '../utils/trpc';
 
 const ReservePage = () => {
@@ -49,7 +48,5 @@ const ReservePage = () => {
     </div>
   );
 };
-
-ReservePage.getLayout = getLayout;
 
 export default ReservePage;
