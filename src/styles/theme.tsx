@@ -1,5 +1,6 @@
 import type { LinkProps } from '@mui/material';
 import { createTheme } from '@mui/material';
+import type {} from '@mui/x-date-pickers/themeAugmentation';
 import type { LinkProps as NextLinkProps } from 'next/link';
 import NextLink from 'next/link';
 import React from 'react';
