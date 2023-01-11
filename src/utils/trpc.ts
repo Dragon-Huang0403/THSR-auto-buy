@@ -29,6 +29,7 @@ export const trpc = createTRPCNext<AppRouter>({
         defaultOptions: {
           queries: {
             refetchOnWindowFocus: false,
+            staleTime: 80 * 1000,
           },
         },
       },
