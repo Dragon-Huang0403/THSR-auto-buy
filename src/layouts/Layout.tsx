@@ -1,4 +1,4 @@
-import { AppBar, Container, Link, Tab, Tabs } from '@mui/material';
+import { AppBar, Box, Container, Link, Tab, Tabs } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -10,20 +10,26 @@ const routes = [
   { href: '/time', name: '時刻表' },
   {
     href: '/',
+    name: '立即購票',
+  },
+  {
+    href: '/reserve',
     name: '預約訂票',
   },
   { href: '/history', name: '預約查詢' },
 ];
 export function Layout({ children }: LayoutProps) {
   const router = useRouter();
-
+  const value = routes.find((route) =>
+    router.pathname.includes(route.href),
+  )?.href;
   return (
-    <Container disableGutters>
-      <AppBar position="static">
+    <Container disableGutters sx={{ pt: 6, height: '100vh' }}>
+      <AppBar>
         <Tabs
           centered
           variant="fullWidth"
-          value={router.pathname}
+          value={value}
           indicatorColor="secondary"
           textColor="inherit"
         >
@@ -38,7 +44,16 @@ export function Layout({ children }: LayoutProps) {
           ))}
         </Tabs>
       </AppBar>
-      {children}
+      <Box
+        sx={{
+          position: 'relative',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {children}
+      </Box>
     </Container>
   );
 }

@@ -23,10 +23,10 @@ export const timeRouter = router({
         StartStation: z.enum(stations),
         EndStation: z.enum(stations),
         OutWardSearchDate: z.date(),
-        ReturnSearchDate: z.date().optional(),
+        // ReturnSearchDate: z.date().optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .query(async ({ input }) => {
       if (input.StartStation === input.EndStation) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -79,7 +79,10 @@ export const timeRouter = router({
           const departureDate = new Date(
             `${item.RunDate} ${item.DepartureTime}`,
           );
-          return departureDate > input.OutWardSearchDate;
+          input.OutWardSearchDate.setTime(
+            input.OutWardSearchDate.getTime() - 1000 * 60 * 30,
+          );
+          return departureDate >= input.OutWardSearchDate;
         }),
       };
       return result;
