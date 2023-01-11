@@ -13,21 +13,19 @@ import { trpc } from '~/src/utils/trpc';
 
 import type { SearchPageQuery } from './search';
 
-const minDate = getMinSearchTime();
-
-const initialValue: RouterInputs['time']['search'] = {
-  SearchType: 'S',
-  Lang: 'TW',
-  OutWardSearchDate: minDate,
-  StartStation: stations[0],
-  EndStation: stations[11],
-};
-
 const Form = styled('form')({});
 
 const TimePage = () => {
-  const [searchBarParams, setSearchBarParams] =
-    useState<RouterInputs['time']['search']>(initialValue);
+  const [minDate] = useState(() => getMinSearchTime());
+  const [searchBarParams, setSearchBarParams] = useState<
+    RouterInputs['time']['search']
+  >({
+    SearchType: 'S',
+    Lang: 'TW',
+    OutWardSearchDate: minDate,
+    StartStation: stations[0],
+    EndStation: stations[11],
+  });
 
   const router = useRouter();
 
@@ -38,6 +36,7 @@ const TimePage = () => {
     OutWardSearchDate.getHours(),
     OutWardSearchDate.getMinutes(),
   ];
+
   const selectableTime = _selectableTime.filter((time) => {
     const now = new Date();
     const date = new Date(OutWardSearchDate);
