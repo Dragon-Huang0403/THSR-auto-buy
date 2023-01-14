@@ -55,12 +55,12 @@ export const ticketRouter = router({
       const formattedDate = getFormattedDate(
         input.bookingOptions.toTimeInputField,
       ).join('/');
-      if (input.bookingOptions.toTimeInputField < minBookingDate) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `此時間 ${formattedDate} 台灣高鐵已開放購票，請自行上網進行購買`,
-        });
-      }
+      // if (input.bookingOptions.toTimeInputField < minBookingDate) {
+      //   throw new TRPCError({
+      //     code: 'BAD_REQUEST',
+      //     message: `此時間 ${formattedDate} 台灣高鐵已開放購票，請自行上網進行購買`,
+      //   });
+      // }
       const bookingOptions = {
         ...input.bookingOptions,
         toTimeInputField: formattedDate,

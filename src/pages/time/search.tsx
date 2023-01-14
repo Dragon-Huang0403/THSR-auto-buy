@@ -11,11 +11,13 @@ import type {
   InferGetServerSidePropsType,
 } from 'next';
 import type { ValueOf } from 'next/dist/shared/lib/constants';
+import { useRouter } from 'next/router';
 import React from 'react';
 import superjson from 'superjson';
 
 import { useLifeCycleContext } from '~/src/features/lifeCycleMachine';
 import type { Stations } from '~/src/models/thsr';
+import { timeOptions } from '~/src/models/thsr';
 import { stationObjects } from '~/src/models/thsr';
 import { createContext } from '~/src/server/trpc/context';
 import { appRouter } from '~/src/server/trpc/router/_app';
@@ -52,6 +54,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       trpcState: ssg.dehydrate(),
       timeSearchData,
       errorMessage: errorMessage,
+      OutWardSearchDate: query.OutWardSearchDate,
     },
   };
 }
@@ -59,8 +62,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 function SearchPage({
   timeSearchData,
   errorMessage,
+  OutWardSearchDate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lifeCycleActor = useLifeCycleContext();
+  const router = useRouter();
   return (
     <>
       <Box
@@ -128,10 +133,23 @@ function SearchPage({
                       (station) =>
                         station.name === timeSearchData?.Title.EndStationName,
                     )?.value ?? '12';
+                  const toTimeInputField = new Date(OutWardSearchDate);
+                  const toTimeTable = timeOptions.find((option) => {
+                    const hour = toTimeInputField.getHours();
+                    const minute = toTimeInputField.getMinutes();
+                    return option.time[0] === hour && option.time[1] === minute;
+                  })?.value;
                   lifeCycleActor.send({
                     type: 'UpdateBookingOptions',
-                    data: { selectStartStation, selectDestinationStation },
+                    data: {
+                      selectStartStation,
+                      selectDestinationStation,
+                      toTimeInputField,
+                      toTrainIDInputField: trainItem.TrainNumber,
+                      ...(toTimeTable ? { toTimeTable } : {}),
+                    },
                   });
+                  router.push('/');
                 }}
               >
                 <Box

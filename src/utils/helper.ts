@@ -1,3 +1,4 @@
+import type { TimeOption } from '../models/thsr';
 import { timeOptions } from '../models/thsr';
 import type { DropFirstFewInTuple, EnumerateStringArray } from './typeHelper';
 
@@ -25,7 +26,7 @@ export function findNearestSelectedTime(time: Date) {
       (option.time[0] === time.getHours() &&
         option.time[1] >= time.getMinutes()) ||
       option.time[0] > time.getHours(),
-  );
+  ) as TimeOption;
   return findLatestTime;
 }
 
