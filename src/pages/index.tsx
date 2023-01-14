@@ -78,65 +78,87 @@ const PurchasePage = () => {
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >
-      <Select
-        label="啟程站"
-        value={{
-          label: Object.values(stationObjects).find(
-            (stationObject) =>
-              stationObject.value === bookingOptions.selectStartStation,
-          )?.name as StationName,
-          value: bookingOptions.selectStartStation,
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
         }}
-        onChange={(newOption) => {
-          lifeCycleSend({
-            type: 'UpdateBookingOptions',
-            data: {
-              selectStartStation: newOption.value,
-            },
-          });
-        }}
-        options={stations.map((station) => ({
-          value: stationObjects[station].value,
-          label: stationObjects[station].name,
-        }))}
-      />
-      <Box sx={{ display: 'grid', placeItems: 'center' }}>
-        <IconButton
-          onClick={() => {
+      >
+        <Select
+          label="啟程站"
+          value={{
+            label: Object.values(stationObjects).find(
+              (stationObject) =>
+                stationObject.value === bookingOptions.selectStartStation,
+            )?.name as StationName,
+            value: bookingOptions.selectStartStation,
+          }}
+          onChange={(newOption) => {
             lifeCycleSend({
               type: 'UpdateBookingOptions',
               data: {
-                selectStartStation: bookingOptions.selectDestinationStation,
-                selectDestinationStation: bookingOptions.selectStartStation,
+                selectStartStation: newOption.value,
               },
             });
           }}
+          options={stations.map((station) => ({
+            value: stationObjects[station].value,
+            label: stationObjects[station].name,
+          }))}
+        />
+        <Box
+          sx={{
+            display: 'grid',
+            placeItems: 'center',
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            translate: '-50% -50%',
+            zIndex: 100,
+            bgcolor: (theme) => theme.palette.common.white,
+            border: (theme) => `1px solid ${theme.palette.grey[500]}`,
+            borderRadius: '50%',
+          }}
         >
-          <SwapVertIcon />
-        </IconButton>
+          <IconButton
+            onClick={() => {
+              lifeCycleSend({
+                type: 'UpdateBookingOptions',
+                data: {
+                  selectStartStation: bookingOptions.selectDestinationStation,
+                  selectDestinationStation: bookingOptions.selectStartStation,
+                },
+              });
+            }}
+          >
+            <SwapVertIcon />
+          </IconButton>
+        </Box>
+        <Select
+          label="到達站"
+          value={{
+            label: Object.values(stationObjects).find(
+              (stationObject) =>
+                stationObject.value === bookingOptions.selectDestinationStation,
+            )?.name as StationName,
+            value: bookingOptions.selectDestinationStation,
+          }}
+          onChange={(newOption) => {
+            lifeCycleSend({
+              type: 'UpdateBookingOptions',
+              data: {
+                selectDestinationStation: newOption.value,
+              },
+            });
+          }}
+          options={stations.map((station) => ({
+            value: stationObjects[station].value,
+            label: stationObjects[station].name,
+          }))}
+        />
       </Box>
-      <Select
-        label="到達站"
-        value={{
-          label: Object.values(stationObjects).find(
-            (stationObject) =>
-              stationObject.value === bookingOptions.selectDestinationStation,
-          )?.name as StationName,
-          value: bookingOptions.selectDestinationStation,
-        }}
-        onChange={(newOption) => {
-          lifeCycleSend({
-            type: 'UpdateBookingOptions',
-            data: {
-              selectDestinationStation: newOption.value,
-            },
-          });
-        }}
-        options={stations.map((station) => ({
-          value: stationObjects[station].value,
-          label: stationObjects[station].name,
-        }))}
-      />
       <DatePicker
         views={['day']}
         label="選擇日期"

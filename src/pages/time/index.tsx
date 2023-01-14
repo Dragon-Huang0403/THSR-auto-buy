@@ -60,53 +60,75 @@ const TimePage = () => {
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >
-      <Select
-        label="啟程站"
-        value={{
-          label: stationObjects[searchBarParams.StartStation].name,
-          value: searchBarParams.StartStation,
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
         }}
-        onChange={(newOption) => {
-          setSearchBarParams((prev) => ({
-            ...prev,
-            StartStation: newOption.value,
-          }));
-        }}
-        options={stations.map((station) => ({
-          value: station,
-          label: stationObjects[station].name,
-        }))}
-      />
-      <Box sx={{ display: 'grid', placeItems: 'center' }}>
-        <IconButton
-          onClick={() => {
+      >
+        <Select
+          label="啟程站"
+          value={{
+            label: stationObjects[searchBarParams.StartStation].name,
+            value: searchBarParams.StartStation,
+          }}
+          onChange={(newOption) => {
             setSearchBarParams((prev) => ({
               ...prev,
-              StartStation: prev.EndStation,
-              EndStation: prev.StartStation,
+              StartStation: newOption.value,
             }));
           }}
+          options={stations.map((station) => ({
+            value: station,
+            label: stationObjects[station].name,
+          }))}
+        />
+        <Box
+          sx={{
+            display: 'grid',
+            placeItems: 'center',
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            translate: '-50% -50%',
+            zIndex: 100,
+            bgcolor: (theme) => theme.palette.common.white,
+            border: (theme) => `1px solid ${theme.palette.grey[500]}`,
+            borderRadius: '50%',
+          }}
         >
-          <SwapVertIcon />
-        </IconButton>
+          <IconButton
+            onClick={() => {
+              setSearchBarParams((prev) => ({
+                ...prev,
+                StartStation: prev.EndStation,
+                EndStation: prev.StartStation,
+              }));
+            }}
+          >
+            <SwapVertIcon />
+          </IconButton>
+        </Box>
+        <Select
+          label="到達站"
+          value={{
+            label: stationObjects[searchBarParams.EndStation].name,
+            value: searchBarParams.EndStation,
+          }}
+          onChange={(newOption) => {
+            setSearchBarParams((prev) => ({
+              ...prev,
+              EndStation: newOption.value,
+            }));
+          }}
+          options={stations.map((station) => ({
+            value: station,
+            label: stationObjects[station].name,
+          }))}
+        />
       </Box>
-      <Select
-        label="到達站"
-        value={{
-          label: stationObjects[searchBarParams.EndStation].name,
-          value: searchBarParams.EndStation,
-        }}
-        onChange={(newOption) => {
-          setSearchBarParams((prev) => ({
-            ...prev,
-            EndStation: newOption.value,
-          }));
-        }}
-        options={stations.map((station) => ({
-          value: station,
-          label: stationObjects[station].name,
-        }))}
-      />
       <DatePicker
         views={['day']}
         label="選擇日期"
