@@ -10,9 +10,13 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next';
+import type { ValueOf } from 'next/dist/shared/lib/constants';
 import React from 'react';
 import superjson from 'superjson';
 
+import { useLifeCycleContext } from '~/src/features/lifeCycleMachine';
+import type { Stations } from '~/src/models/thsr';
+import { stationObjects } from '~/src/models/thsr';
 import { createContext } from '~/src/server/trpc/context';
 import { appRouter } from '~/src/server/trpc/router/_app';
 import type { RouterInputs } from '~/src/utils/trpc';
@@ -56,6 +60,7 @@ function SearchPage({
   timeSearchData,
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const lifeCycleActor = useLifeCycleContext();
   return (
     <>
       <Box
@@ -111,6 +116,22 @@ function SearchPage({
                 sx={{
                   bgcolor: (theme) => theme.palette.grey[100],
                   borderRadius: 2,
+                }}
+                onClick={() => {
+                  const selectStartStation =
+                    (Object.values(stationObjects) as ValueOf<Stations>[]).find(
+                      (station) =>
+                        station.name === timeSearchData?.Title.StartStationName,
+                    )?.value ?? '1';
+                  const selectDestinationStation =
+                    (Object.values(stationObjects) as ValueOf<Stations>[]).find(
+                      (station) =>
+                        station.name === timeSearchData?.Title.EndStationName,
+                    )?.value ?? '12';
+                  lifeCycleActor.send({
+                    type: 'UpdateBookingOptions',
+                    data: { selectStartStation, selectDestinationStation },
+                  });
                 }}
               >
                 <Box

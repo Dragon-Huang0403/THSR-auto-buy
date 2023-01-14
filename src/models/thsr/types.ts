@@ -9,7 +9,7 @@ import type {
   elderTicketValues,
   searchTypes,
   stationObjects,
-  toTimeTableValues,
+  timeOptions,
 } from './constants';
 
 type DiscountType = ValueOf<typeof discountType>;
@@ -18,7 +18,11 @@ export type Stations = typeof stationObjects;
 export type Station = keyof Stations;
 export type StationName = ValueOf<Stations>['name'];
 export type StationValue = ValueOf<Stations>['value'];
-type StationNo = `0${Exclude<StationValue, 10 | 11 | 12>}` | '10' | '11' | '12';
+type StationNo =
+  | `0${Exclude<StationValue, '10' | '11' | '12'>}`
+  | '10'
+  | '11'
+  | '12';
 
 /**
  * S 為單程
@@ -154,4 +158,5 @@ export type DisabledTicketValue = typeof disabledTicketValues[number];
 export type ElderTicketValue = typeof elderTicketValues[number];
 export type CollegeTicketValue = typeof collegeTicketValues[number];
 
-export type ToTimeTableValue = typeof toTimeTableValues[number];
+export type TimeOption = typeof timeOptions[number];
+export type ToTimeTableValue = TimeOption['value'];

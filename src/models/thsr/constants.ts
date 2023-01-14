@@ -1,5 +1,7 @@
 import { intRangeArray } from '~/src/utils/helper';
 
+import type { ToTimeTableValue } from './types';
+
 export const stationObjects = {
   NanGang: { name: '南港', value: '1' },
   TaiPei: { name: '台北', value: '2' },
@@ -32,6 +34,8 @@ export const stations = [
 
 export const stationValues = intRangeArray(1, 13);
 
+const earlyBird = 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
+
 export const searchTypes = {
   S: { name: '單程', value: 0 },
   R: { name: '去回程', value: 1 },
@@ -43,48 +47,167 @@ export const disabledTicketValues = intRangeArray(0, 11, 'W');
 export const elderTicketValues = intRangeArray(0, 11, 'E');
 export const collegeTicketValues = intRangeArray(0, 11, 'P');
 
-export const toTimeTableValues = [
-  '1201A',
-  '1230A',
-  '600A',
-  '630A',
-  '700A',
-  '730A',
-  '800A',
-  '830A',
-  '900A',
-  '930A',
-  '1000A',
-  '1030A',
-  '1100A',
-  '1130A',
-  '1200N',
-  '1230P',
-  '100P',
-  '130P',
-  '200P',
-  '230P',
-  '300P',
-  '330P',
-  '400P',
-  '430P',
-  '500P',
-  '530P',
-  '600P',
-  '630P',
-  '700P',
-  '730P',
-  '800P',
-  '830P',
-  '900P',
-  '930P',
-  '1000P',
-  '1030P',
-  '1100P',
-  '1130P',
+export const timeOptions = [
+  {
+    value: '1201A',
+    time: [0, 0],
+  },
+  {
+    value: '1230A',
+    time: [0, 30],
+  },
+  {
+    value: '600A',
+    time: [6, 0],
+  },
+  {
+    value: '630A',
+    time: [6, 30],
+  },
+  {
+    value: '700A',
+    time: [7, 0],
+  },
+  {
+    value: '730A',
+    time: [7, 30],
+  },
+  {
+    value: '800A',
+    time: [8, 0],
+  },
+  {
+    value: '830A',
+    time: [8, 30],
+  },
+  {
+    value: '900A',
+    time: [9, 0],
+  },
+  {
+    value: '930A',
+    time: [9, 30],
+  },
+  {
+    value: '1000A',
+    time: [10, 0],
+  },
+  {
+    value: '1030A',
+    time: [10, 30],
+  },
+  {
+    value: '1100A',
+    time: [11, 0],
+  },
+  {
+    value: '1130A',
+    time: [11, 30],
+  },
+  {
+    value: '1200N',
+    time: [12, 0],
+  },
+  {
+    value: '1230P',
+    time: [12, 30],
+  },
+  {
+    value: '100P',
+    time: [13, 0],
+  },
+  {
+    value: '130P',
+    time: [13, 30],
+  },
+  {
+    value: '200P',
+    time: [14, 0],
+  },
+  {
+    value: '230P',
+    time: [14, 30],
+  },
+  {
+    value: '300P',
+    time: [15, 0],
+  },
+  {
+    value: '330P',
+    time: [15, 30],
+  },
+  {
+    value: '400P',
+    time: [16, 0],
+  },
+  {
+    value: '430P',
+    time: [16, 30],
+  },
+  {
+    value: '500P',
+    time: [17, 0],
+  },
+  {
+    value: '530P',
+    time: [17, 30],
+  },
+  {
+    value: '600P',
+    time: [18, 0],
+  },
+  {
+    value: '630P',
+    time: [18, 30],
+  },
+  {
+    value: '700P',
+    time: [19, 0],
+  },
+  {
+    value: '730P',
+    time: [19, 30],
+  },
+  {
+    value: '800P',
+    time: [20, 0],
+  },
+  {
+    value: '830P',
+    time: [20, 30],
+  },
+  {
+    value: '900P',
+    time: [21, 0],
+  },
+  {
+    value: '930P',
+    time: [21, 30],
+  },
+  {
+    value: '1000P',
+    time: [22, 0],
+  },
+  {
+    value: '1030P',
+    time: [22, 30],
+  },
+  {
+    value: '1100P',
+    time: [23, 0],
+  },
+  {
+    value: '1130P',
+    time: [23, 30],
+  },
 ] as const;
 
-const earlyBird = 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
+export const toTimeTableValues = timeOptions.map((option) => option.value) as [
+  ToTimeTableValue,
+  ToTimeTableValue,
+  ...ToTimeTableValue[],
+];
+
 const collegeStudent = '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
 export const discountType = {
   earlyBird,

@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { Select } from '~/src/components/Select';
-import { stationObjects, stations } from '~/src/models/thsr';
-import { selectableTime as _selectableTime } from '~/src/utils/constants';
+import type { TimeOption } from '~/src/models/thsr';
+import { stationObjects, stations, timeOptions } from '~/src/models/thsr';
 import { getMinSearchTime, padTo2Digit } from '~/src/utils/helper';
 import type { RouterInputs } from '~/src/utils/trpc';
 import { trpc } from '~/src/utils/trpc';
@@ -32,16 +32,19 @@ const TimePage = () => {
   const { data: maxSearchDate, error } = trpc.time.availableDate.useQuery();
   error;
   const { OutWardSearchDate } = searchBarParams;
-  const selectedTime: [number, number] = [
+  const selectedTime = [
     OutWardSearchDate.getHours(),
     OutWardSearchDate.getMinutes(),
-  ];
+  ] as TimeOption['time'];
 
-  const selectableTime = _selectableTime.filter((time) => {
+  const selectableTime = timeOptions.filter((option) => {
     const now = new Date();
+    if (now.getDate() !== OutWardSearchDate.getDate()) {
+      return true;
+    }
     const date = new Date(OutWardSearchDate);
-    date.setHours(time[0]);
-    date.setMinutes(time[1]);
+    date.setHours(option.time[0]);
+    date.setMinutes(option.time[1]);
     return date >= now;
   });
 
@@ -141,9 +144,9 @@ const TimePage = () => {
             OutWardSearchDate: newDate,
           }));
         }}
-        options={selectableTime.map((time) => ({
-          value: time,
-          label: time.map((item) => padTo2Digit(item)).join(':'),
+        options={selectableTime.map((option) => ({
+          value: option.time,
+          label: option.time.map((item) => padTo2Digit(item)).join(':'),
         }))}
       />
 

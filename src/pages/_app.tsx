@@ -3,6 +3,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { type AppType } from 'next/app';
 
+import { LifeCycleProvider } from '~/src/features/lifeCycleMachine';
 import { getLayout } from '~/src/layouts/Layout';
 import { theme } from '~/src/styles/theme';
 
@@ -14,7 +15,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          {getLayout(<Component {...pageProps} />)}
+          <LifeCycleProvider>
+            {getLayout(<Component {...pageProps} />)}
+          </LifeCycleProvider>
         </LocalizationProvider>
       </ThemeProvider>
     </>

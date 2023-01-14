@@ -1,4 +1,4 @@
-import { selectableTime } from './constants';
+import { timeOptions } from '../models/thsr';
 import type { DropFirstFewInTuple, EnumerateStringArray } from './typeHelper';
 
 export function padTo2Digit(num: number) {
@@ -19,19 +19,25 @@ export function getFormattedTime(date: Date) {
   );
 }
 
+export function findNearestSelectedTime(time: Date) {
+  const findLatestTime = timeOptions.find(
+    (option) =>
+      (option.time[0] === time.getHours() &&
+        option.time[1] >= time.getMinutes()) ||
+      option.time[0] > time.getHours(),
+  );
+  return findLatestTime;
+}
+
 export function getMinSearchTime() {
   const now = new Date();
   now.setSeconds(0);
   now.setMilliseconds(0);
-  const findLatestTime = selectableTime.find(
-    (time) =>
-      (time[0] === now.getHours() && time[1] >= now.getMinutes()) ||
-      time[0] > now.getHours(),
-  );
+  const findLatestTime = findNearestSelectedTime(now);
 
   if (findLatestTime) {
-    now.setHours(findLatestTime[0]);
-    now.setMinutes(findLatestTime[1]);
+    now.setHours(findLatestTime.time[0]);
+    now.setMinutes(findLatestTime.time[1]);
   }
   return now;
 }
