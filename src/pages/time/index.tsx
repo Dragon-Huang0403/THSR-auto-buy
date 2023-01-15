@@ -1,62 +1,43 @@
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { Box, Button, IconButton, styled, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { shallow } from 'zustand/shallow';
 
 import { Select } from '~/src/components/Select';
-import type { TimeOption } from '~/src/models/thsr';
-import { stationObjects, stations, timeOptions } from '~/src/models/thsr';
-import { getMinSearchTime, padTo2Digit } from '~/src/utils/helper';
-import type { RouterInputs } from '~/src/utils/trpc';
+import { stationObjects, stations } from '~/src/models/thsr';
+import { useTicketStore } from '~/src/store';
 import { trpc } from '~/src/utils/trpc';
 
 import type { SearchPageQuery } from './search';
 
 const Form = styled('form')({});
 
+const MIN_TIME = new Date('2023-01-01T06:00');
+const MAX_TIME = new Date('2023-01-01T23:59');
+
 const TimePage = () => {
-  const [minDate] = useState(() => getMinSearchTime());
-  const [searchBarParams, setSearchBarParams] = useState<
-    RouterInputs['time']['search']
-  >({
-    SearchType: 'S',
-    Lang: 'TW',
-    OutWardSearchDate: minDate,
-    StartStation: stations[0],
-    EndStation: stations[11],
-  });
+  const { searchOptions, minDate, dispatch } = useTicketStore(
+    (state) => ({
+      searchOptions: state.searchOptions,
+      minDate: state.minDate,
+      dispatch: state.dispatch,
+    }),
+    shallow,
+  );
+  const { data: maxDate } = trpc.time.availableDate.useQuery();
 
   const router = useRouter();
-
-  const { data: maxSearchDate, error } = trpc.time.availableDate.useQuery();
-  error;
-  const { OutWardSearchDate } = searchBarParams;
-  const selectedTime = [
-    OutWardSearchDate.getHours(),
-    OutWardSearchDate.getMinutes(),
-  ] as TimeOption['time'];
-
-  const selectableTime = timeOptions.filter((option) => {
-    const now = new Date();
-    if (now.getDate() !== OutWardSearchDate.getDate()) {
-      return true;
-    }
-    const date = new Date(OutWardSearchDate);
-    date.setHours(option.time[0]);
-    date.setMinutes(option.time[1]);
-    return date >= now;
-  });
 
   return (
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        const searchPageQuery: SearchPageQuery = {
-          ...searchBarParams,
-          OutWardSearchDate: searchBarParams.OutWardSearchDate.toString(),
+        const searchParams: SearchPageQuery = {
+          ...searchOptions,
+          searchDate: searchOptions.searchDate.toString(),
         };
-        router.push(`/time/search?${new URLSearchParams(searchPageQuery)}`);
+        router.push(`/time/search?${new URLSearchParams(searchParams)}`);
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >
@@ -71,14 +52,15 @@ const TimePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: stationObjects[searchBarParams.StartStation].name,
-            value: searchBarParams.StartStation,
+            label: stationObjects[searchOptions.startStation].name,
           }}
           onChange={(newOption) => {
-            setSearchBarParams((prev) => ({
-              ...prev,
-              StartStation: newOption.value,
-            }));
+            dispatch({
+              type: 'searchOptions',
+              payload: {
+                startStation: newOption.value,
+              },
+            });
           }}
           options={stations.map((station) => ({
             value: station,
@@ -101,11 +83,13 @@ const TimePage = () => {
         >
           <IconButton
             onClick={() => {
-              setSearchBarParams((prev) => ({
-                ...prev,
-                StartStation: prev.EndStation,
-                EndStation: prev.StartStation,
-              }));
+              dispatch({
+                type: 'searchOptions',
+                payload: {
+                  startStation: searchOptions.endStation,
+                  endStation: searchOptions.startStation,
+                },
+              });
             }}
           >
             <SwapVertIcon />
@@ -114,14 +98,15 @@ const TimePage = () => {
         <Select
           label="到達站"
           value={{
-            label: stationObjects[searchBarParams.EndStation].name,
-            value: searchBarParams.EndStation,
+            label: stationObjects[searchOptions.endStation].name,
           }}
           onChange={(newOption) => {
-            setSearchBarParams((prev) => ({
-              ...prev,
-              EndStation: newOption.value,
-            }));
+            dispatch({
+              type: 'searchOptions',
+              payload: {
+                endStation: newOption.value,
+              },
+            });
           }}
           options={stations.map((station) => ({
             value: station,
@@ -132,46 +117,33 @@ const TimePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={OutWardSearchDate}
+        value={searchOptions.searchDate}
         minDate={minDate}
-        maxDate={maxSearchDate}
+        maxDate={maxDate}
         onChange={(newValue) => {
           if (!newValue) return;
-          let newDate = new Date(OutWardSearchDate);
-          newDate.setMonth(newValue.getMonth());
-          newDate.setDate(newValue.getDate());
-          const now = new Date();
-          if (newDate < now) {
-            newDate = getMinSearchTime();
-          }
-          setSearchBarParams((prev) => ({
-            ...prev,
-            OutWardSearchDate: newDate,
-          }));
+          dispatch({
+            type: 'searchOptions',
+            payload: { searchDate: newValue },
+          });
         }}
         renderInput={(params) => <TextField {...params} helperText={null} />}
       />
-      <Select
+      <TimePicker
+        renderInput={(params) => <TextField {...params} />}
+        value={searchOptions.searchDate}
         label="選擇時間"
-        value={{
-          label: selectedTime.map((item) => padTo2Digit(item)).join(':'),
-          value: selectedTime,
+        ampm={false}
+        onChange={(newValue) => {
+          if (!newValue) return;
+          dispatch({
+            type: 'searchOptions',
+            payload: { searchDate: newValue },
+          });
         }}
-        onChange={(newOption) => {
-          const newDate = new Date(OutWardSearchDate);
-          newDate.setHours(newOption.value[0]);
-          newDate.setMinutes(newOption.value[1]);
-          setSearchBarParams((prev) => ({
-            ...prev,
-            OutWardSearchDate: newDate,
-          }));
-        }}
-        options={selectableTime.map((option) => ({
-          value: option.time,
-          label: option.time.map((item) => padTo2Digit(item)).join(':'),
-        }))}
+        minTime={MIN_TIME}
+        maxTime={MAX_TIME}
       />
-
       <Button type="submit">查詢</Button>
     </Form>
   );

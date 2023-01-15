@@ -34,8 +34,6 @@ export const stations = [
 
 export const stationValues = intRangeArray(1, 13);
 
-const earlyBird = 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
-
 export const searchTypes = {
   S: { name: '單程', value: 0 },
   R: { name: '去回程', value: 1 },
@@ -46,6 +44,14 @@ export const childTicketValues = intRangeArray(0, 11, 'H');
 export const disabledTicketValues = intRangeArray(0, 11, 'W');
 export const elderTicketValues = intRangeArray(0, 11, 'E');
 export const collegeTicketValues = intRangeArray(0, 11, 'P');
+
+const earlyBird = 'e1b4c4d9-98d7-4c8c-9834-e1d2528750f1';
+const collegeStudent = '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
+export const discountType = {
+  earlyBird,
+  collegeStudent,
+  all: `${earlyBird},${collegeStudent}`,
+} as const;
 
 export const timeOptions = [
   {
@@ -207,10 +213,3 @@ export const toTimeTableValues = timeOptions.map((option) => option.value) as [
   ToTimeTableValue,
   ...ToTimeTableValue[],
 ];
-
-const collegeStudent = '68d9fc7b-7330-44c2-962a-74bc47d2ee8a';
-export const discountType = {
-  earlyBird,
-  collegeStudent,
-  all: `${earlyBird},${collegeStudent}`,
-} as const;

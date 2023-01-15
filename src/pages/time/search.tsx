@@ -1,32 +1,35 @@
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import DirectionsTransitRoundedIcon from '@mui/icons-material/DirectionsTransitRounded';
-import EastRoundedIcon from '@mui/icons-material/EastRounded';
-import KeyboardDoubleArrowRightRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
-import RouteRoundedIcon from '@mui/icons-material/RouteRounded';
-import ScheduleRoundedIcon from '@mui/icons-material/ScheduleRounded';
+import {
+  ArrowBackRounded,
+  DirectionsTransitRounded,
+  EastRounded,
+  KeyboardDoubleArrowRightRounded,
+  RouteRounded,
+  ScheduleRounded,
+} from '@mui/icons-material';
 import { Box, IconButton, Link, Typography } from '@mui/material';
 import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import { format, subMinutes } from 'date-fns';
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next';
-import type { ValueOf } from 'next/dist/shared/lib/constants';
 import { useRouter } from 'next/router';
 import React from 'react';
 import superjson from 'superjson';
 
-import { useLifeCycleContext } from '~/src/features/lifeCycleMachine';
-import type { Stations } from '~/src/models/thsr';
-import { timeOptions } from '~/src/models/thsr';
 import { stationObjects } from '~/src/models/thsr';
 import { createContext } from '~/src/server/trpc/context';
 import { appRouter } from '~/src/server/trpc/router/_app';
-import type { RouterInputs } from '~/src/utils/trpc';
+import type { TicketStore } from '~/src/store';
+import { useTicketStore } from '~/src/store';
+import { CHINESE_DAYS } from '~/src/utils/constants';
 
 export type SearchPageQuery = Omit<
-  RouterInputs['time']['search'],
-  'OutWardSearchDate'
-> & { OutWardSearchDate: string };
+  TicketStore['searchOptions'],
+  'searchDate'
+> & {
+  searchDate: string;
+};
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const ssg = createProxySSGHelpers({
@@ -36,11 +39,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   });
 
   const query = context.query as SearchPageQuery;
-
+  const searchDate = new Date(query.searchDate as string);
   const searchParams = {
     ...query,
-    OutWardSearchDate: new Date(query.OutWardSearchDate as string),
+    searchDate,
   };
+
   let timeSearchData = null;
   let errorMessage = null;
   try {
@@ -52,20 +56,39 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       trpcState: ssg.dehydrate(),
-      timeSearchData,
+      trainItems: timeSearchData?.DepartureTable.TrainItem,
+      priceTable: timeSearchData?.PriceTable,
       errorMessage: errorMessage,
-      OutWardSearchDate: query.OutWardSearchDate,
+      searchOptions: {
+        ...query,
+        searchDate,
+      },
     },
   };
 }
 
+const SEARCH_BUFFER_MINUTES = 30;
+
 function SearchPage({
-  timeSearchData,
+  trainItems,
   errorMessage,
-  OutWardSearchDate,
+  searchOptions,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const lifeCycleActor = useLifeCycleContext();
   const router = useRouter();
+
+  const dispatch = useTicketStore((state) => state.dispatch);
+
+  const offsetSearchDate = subMinutes(
+    searchOptions.searchDate,
+    SEARCH_BUFFER_MINUTES,
+  );
+  const filteredTrainItems = trainItems?.filter((trainItem) => {
+    const departureDate = new Date(
+      `${trainItem.RunDate} ${trainItem.DepartureTime}`,
+    );
+    return departureDate >= offsetSearchDate;
+  });
+
   return (
     <>
       <Box
@@ -84,18 +107,20 @@ function SearchPage({
           LinkComponent={Link}
           href="/time"
         >
-          <ArrowBackRoundedIcon />
+          <ArrowBackRounded />
         </IconButton>
         <Typography variant="h5">
-          {timeSearchData?.Title.StartStationName}
+          {stationObjects[searchOptions.startStation].name}
         </Typography>
-        <KeyboardDoubleArrowRightRoundedIcon fontSize="large" />
+        <KeyboardDoubleArrowRightRounded fontSize="large" />
         <Typography variant="h5">
-          {timeSearchData?.Title.EndStationName}
+          {stationObjects[searchOptions.endStation].name}
         </Typography>
       </Box>
       <Typography variant="body2" sx={{ ml: 2.5 }}>
-        {timeSearchData?.Title.TitleSplit2}
+        {`${format(searchOptions.searchDate, 'yyyy/MM/dd')} (${
+          CHINESE_DAYS[searchOptions.searchDate.getDay()]
+        })`}
       </Typography>
       {errorMessage && <Typography>{errorMessage}</Typography>}
       <Box
@@ -110,109 +135,90 @@ function SearchPage({
           height: '100%',
         }}
       >
-        {timeSearchData &&
-          timeSearchData.TrainItem.map((trainItem) => {
-            const discount = trainItem.Discount.map(
-              (item) => `${item.Name} ${item.Value}`,
-            ).join('，');
-            return (
+        {filteredTrainItems?.map((trainItem) => {
+          const discount = trainItem.Discount.map(
+            (item) => `${item.Name} ${item.Value}`,
+          ).join('，');
+          return (
+            <Box
+              key={trainItem.TrainNumber}
+              sx={{
+                bgcolor: (theme) => theme.palette.grey[100],
+                borderRadius: 2,
+              }}
+              onClick={() => {
+                dispatch({
+                  type: 'bookingOptions',
+                  payload: {
+                    bookingMethod: 'trainNo',
+                    trainNo: trainItem.TrainNumber,
+                  },
+                });
+                dispatch({
+                  type: 'searchOptions',
+                  payload: searchOptions,
+                });
+                router.push('/');
+              }}
+            >
               <Box
-                key={trainItem.TrainNumber}
                 sx={{
-                  bgcolor: (theme) => theme.palette.grey[100],
-                  borderRadius: 2,
-                }}
-                onClick={() => {
-                  const selectStartStation =
-                    (Object.values(stationObjects) as ValueOf<Stations>[]).find(
-                      (station) =>
-                        station.name === timeSearchData?.Title.StartStationName,
-                    )?.value ?? '1';
-                  const selectDestinationStation =
-                    (Object.values(stationObjects) as ValueOf<Stations>[]).find(
-                      (station) =>
-                        station.name === timeSearchData?.Title.EndStationName,
-                    )?.value ?? '12';
-                  const toTimeInputField = new Date(OutWardSearchDate);
-                  const toTimeTable = timeOptions.find((option) => {
-                    const hour = toTimeInputField.getHours();
-                    const minute = toTimeInputField.getMinutes();
-                    return option.time[0] === hour && option.time[1] === minute;
-                  })?.value;
-                  lifeCycleActor.send({
-                    type: 'UpdateBookingOptions',
-                    data: {
-                      selectStartStation,
-                      selectDestinationStation,
-                      toTimeInputField,
-                      toTrainIDInputField: trainItem.TrainNumber,
-                      ...(toTimeTable ? { toTimeTable } : {}),
-                    },
-                  });
-                  router.push('/');
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  pl: 2,
+                  pr: 1.5,
+                  pt: 1,
+                  alignItems: 'center',
                 }}
               >
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                  <Typography variant="h6">
+                    {trainItem.DepartureTime}
+                  </Typography>
+                  <EastRounded />
+                  <Typography variant="h6">
+                    {trainItem.DestinationTime}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <ScheduleRounded fontSize="small" />
+                  <Typography variant="body2">{trainItem.Duration}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex' }}>
+                  <DirectionsTransitRounded />
+                  <Typography>{trainItem.TrainNumber}</Typography>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  borderTop: (theme) => `1px solid ${theme.palette.grey[400]}`,
+                  pl: 2,
+                  px: 1.5,
+                  pt: 0.5,
+                  pb: 1,
+                }}
+              >
+                <Typography variant="body2" sx={{ ml: 1 }}>
+                  {discount}
+                </Typography>
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    pl: 2,
-                    pr: 1.5,
-                    pt: 1,
+                    gap: 0.5,
                     alignItems: 'center',
                   }}
                 >
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <Typography variant="h6">
-                      {trainItem.DepartureTime}
-                    </Typography>
-                    <EastRoundedIcon />
-                    <Typography variant="h6">
-                      {trainItem.DestinationTime}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <ScheduleRoundedIcon fontSize="small" />
-                    <Typography variant="body2">
-                      {trainItem.Duration}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex' }}>
-                    <DirectionsTransitRoundedIcon />
-                    <Typography>{trainItem.TrainNumber}</Typography>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    borderTop: (theme) =>
-                      `1px solid ${theme.palette.grey[400]}`,
-                    pl: 2,
-                    px: 1.5,
-                    pt: 0.5,
-                    pb: 1,
-                  }}
-                >
-                  <Typography variant="body2" sx={{ ml: 1 }}>
-                    {discount}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      gap: 0.5,
-                      alignItems: 'center',
-                    }}
-                  >
-                    <IconButton sx={{ p: 0 }}>
-                      <RouteRoundedIcon fontSize="small" />
-                    </IconButton>
-                    <Typography variant="body2">停靠站</Typography>
-                  </Box>
+                  <IconButton sx={{ p: 0 }}>
+                    <RouteRounded fontSize="small" />
+                  </IconButton>
+                  <Typography variant="body2">停靠站</Typography>
                 </Box>
               </Box>
-            );
-          })}
+            </Box>
+          );
+        })}
       </Box>
     </>
   );

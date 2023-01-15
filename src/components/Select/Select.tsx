@@ -11,7 +11,7 @@ type Option = {
 interface SelectProps<TOption extends Option> {
   label: string;
   options: readonly TOption[];
-  value: TOption;
+  value: Option;
   onChange: (newOption: TOption) => void;
 }
 
