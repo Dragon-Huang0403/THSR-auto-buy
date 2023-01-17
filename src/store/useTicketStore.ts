@@ -3,6 +3,8 @@ import { create } from 'zustand';
 import type { StorageValue } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
 
+import type { BOOKING_METHODS } from '~/src/utils/constants';
+
 import type { Station } from '../models/thsr';
 import { stations } from '../models/thsr';
 import { getMinSearchTime } from '../utils/helper';
@@ -15,7 +17,7 @@ export type TicketStore = {
     searchDate: Date;
   };
   bookingOptions: {
-    bookingMethod: 'time' | 'trainNo';
+    bookingMethod: typeof BOOKING_METHODS[number]['value'];
     trainNo: string;
     ticketCounts: {
       adult: number;
@@ -74,11 +76,17 @@ export const useTicketStore = create<TicketStore>()(
     {
       name: 'ticketStore',
       storage: {
-        getItem: (name) => {
+        getItem: async (name) => {
           const str = localStorage.getItem(name);
           if (!str) {
             return null;
           }
+          /**
+           * TODO: Fix mui input ssr class name not match issue
+           */
+          await new Promise((res) => {
+            setTimeout(res, 500);
+          });
           const oldState = superjson.parse<StorageValue<TicketStore>>(str);
           const minDate = getMinSearchTime();
           if (minDate > oldState.state.searchOptions.searchDate) {

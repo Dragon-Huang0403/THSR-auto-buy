@@ -1,84 +1,79 @@
-import { TRPCError } from '@trpc/server';
+import { format } from 'date-fns';
 import { z } from 'zod';
 
-import {
-  adultTicketValues,
-  childTicketValues,
-  collegeTicketValues,
-  disabledTicketValues,
-  elderTicketValues,
-  stationValues,
-  toTimeTableValues,
-} from '~/src/models/thsr/constants';
-import { getFormattedDate } from '~/src/utils/helper';
+import { stationObjects, stations } from '~/src/models/thsr/constants';
+import { findNearestSelectedTime } from '~/src/utils/helper';
+import { checkTaiwanId } from '~/src/utils/taiwanIdGenerator';
 
 import {
   bookingByDateFlow,
   bookingByTrainNoFlow,
 } from '../../THSR/bookingFlow';
 import { ticketHistoryFlow } from '../../THSR/ticketHistoryFlow';
-import { getAvailableDate } from '../../THSR/utils/searchApis';
 import { publicProcedure, router } from '../trpc';
 
 export const ticketRouter = router({
   reserve: publicProcedure
     .input(
       z.object({
+        searchOptions: z.object({
+          startStation: z.enum(stations),
+          endStation: z.enum(stations),
+          searchDate: z.date(),
+        }),
         bookingOptions: z.object({
-          selectStartStation: z.enum(stationValues),
-          selectDestinationStation: z.enum(stationValues),
-          'trainCon:trainRadioGroup': z.literal(0).or(z.literal(1)),
-          'tripCon:typesoftrip': z.literal(0).or(z.literal(1)),
-          'seatCon:seatRadioGroup': z
-            .literal(0)
-            .or(z.literal(1))
-            .or(z.literal(2)),
-          toTimeInputField: z.date(),
-          toTimeTable: z.enum(toTimeTableValues),
-          'ticketPanel:rows:0:ticketAmount': z.enum(adultTicketValues),
-          'ticketPanel:rows:1:ticketAmount': z.enum(childTicketValues),
-          'ticketPanel:rows:2:ticketAmount': z.enum(disabledTicketValues),
-          'ticketPanel:rows:3:ticketAmount': z.enum(elderTicketValues),
-          'ticketPanel:rows:4:ticketAmount': z.enum(collegeTicketValues),
-          toTrainIDInputField: z.string(),
+          bookingMethod: z.enum(['trainNo', 'time']),
+          trainNo: z.string(),
+          ticketCounts: z.object({
+            adult: z.number().min(0).max(10),
+            child: z.number().min(0).max(10),
+            disabled: z.number().min(0).max(10),
+            elder: z.number().min(0).max(10),
+            college: z.number().min(0).max(10),
+          }),
         }),
-        buyerInfo: z.object({
-          dummyId: z.string().length(10),
-          dummyPhone: z.string(),
-          email: z.string(),
+        userInfo: z.object({
+          taiwanId: z
+            .string()
+            .refine(checkTaiwanId, { message: '身分證字號錯誤' }),
+          email: z.string().email().or(z.literal('')),
+          phone: z.string(),
         }),
-        buyNthTrainItem: z.number().optional(),
       }),
     )
     .mutation(async ({ input }) => {
-      const minBookingDate = await getAvailableDate();
-      const formattedDate = getFormattedDate(
-        input.bookingOptions.toTimeInputField,
-      ).join('/');
-      // if (input.bookingOptions.toTimeInputField < minBookingDate) {
-      //   throw new TRPCError({
-      //     code: 'BAD_REQUEST',
-      //     message: `此時間 ${formattedDate} 台灣高鐵已開放購票，請自行上網進行購買`,
-      //   });
-      // }
-      const bookingOptions = {
-        ...input.bookingOptions,
-        toTimeInputField: formattedDate,
-      };
+      console.log(input);
+      const { bookingOptions, userInfo, searchOptions } = input;
+
+      const request = {
+        selectStartStation: stationObjects[searchOptions.startStation].value,
+        selectDestinationStation:
+          stationObjects[searchOptions.endStation].value,
+        toTimeInputField: format(searchOptions.searchDate, 'yyyy/MM/dd'),
+        'trainCon:trainRadioGroup': 0,
+        'seatCon:seatRadioGroup': 0,
+        'tripCon:typesoftrip': 0,
+        'ticketPanel:rows:0:ticketAmount': `${bookingOptions.ticketCounts.adult}F`,
+        'ticketPanel:rows:1:ticketAmount': `${bookingOptions.ticketCounts.child}H`,
+        'ticketPanel:rows:2:ticketAmount': `${bookingOptions.ticketCounts.disabled}W`,
+        'ticketPanel:rows:3:ticketAmount': `${bookingOptions.ticketCounts.elder}E`,
+        'ticketPanel:rows:4:ticketAmount': `${bookingOptions.ticketCounts.college}P`,
+        toTimeTable: findNearestSelectedTime(searchOptions.searchDate).value,
+        toTrainIDInputField: bookingOptions.trainNo,
+      } as const;
+      const buyerInfo = {
+        dummyId: userInfo.taiwanId,
+        dummyPhone: userInfo.phone,
+        email: userInfo.email,
+      } as const;
 
       let result;
-      if (input.bookingOptions.toTrainIDInputField) {
-        result = await bookingByTrainNoFlow(bookingOptions, input.buyerInfo);
+      if (input.bookingOptions.bookingMethod === 'trainNo') {
+        result = await bookingByTrainNoFlow(request, buyerInfo);
       } else {
-        result = await bookingByDateFlow(
-          bookingOptions,
-          input.buyerInfo,
-          input.buyNthTrainItem,
-        );
+        result = await bookingByDateFlow(request, buyerInfo);
       }
-
       console.log({ result });
-
       return result;
     }),
   history: publicProcedure

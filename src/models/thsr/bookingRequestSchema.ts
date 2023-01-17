@@ -1,13 +1,9 @@
-import type {
-  AdultTicketValue,
-  ChildTicketValue,
-  CollegeTicketValue,
-  DisabledTicketValue,
-  ElderTicketValue,
-  StationValue,
-  ToTimeTableValue,
-} from './types';
+import type { StationValue, ToTimeTableValue } from './types';
 
+/**
+ * 0 ~ 10
+ */
+type TicketAmount<T extends string> = `${number}${T}`;
 export type CommonBookingOptions = {
   selectStartStation: StationValue;
   selectDestinationStation: StationValue;
@@ -34,23 +30,23 @@ export type CommonBookingOptions = {
   /**
    * Adult Tickets
    */
-  'ticketPanel:rows:0:ticketAmount': AdultTicketValue;
+  'ticketPanel:rows:0:ticketAmount': TicketAmount<'F'>;
   /**
    * Child Tickets (6-11)
    */
-  'ticketPanel:rows:1:ticketAmount': ChildTicketValue;
+  'ticketPanel:rows:1:ticketAmount': TicketAmount<'H'>;
   /**
    * Disabled ticket (Taiwan only)
    */
-  'ticketPanel:rows:2:ticketAmount': DisabledTicketValue;
+  'ticketPanel:rows:2:ticketAmount': TicketAmount<'W'>;
   /**
    * Elder ticket (Taiwan only)
    */
-  'ticketPanel:rows:3:ticketAmount': ElderTicketValue;
+  'ticketPanel:rows:3:ticketAmount': TicketAmount<'E'>;
   /**
    * College student ticket (Taiwan only)
    */
-  'ticketPanel:rows:4:ticketAmount': CollegeTicketValue;
+  'ticketPanel:rows:4:ticketAmount': TicketAmount<'P'>;
 };
 
 export type BookingByDateOptions = {

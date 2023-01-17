@@ -7,14 +7,12 @@ import { shallow } from 'zustand/shallow';
 import { Select } from '~/src/components/Select';
 import { stationObjects, stations } from '~/src/models/thsr';
 import { useTicketStore } from '~/src/store';
+import { MAX_TIME, MIN_TIME } from '~/src/utils/constants';
 import { trpc } from '~/src/utils/trpc';
 
 import type { SearchPageQuery } from './search';
 
 const Form = styled('form')({});
-
-const MIN_TIME = new Date('2023-01-01T06:00');
-const MAX_TIME = new Date('2023-01-01T23:59');
 
 const TimePage = () => {
   const { searchOptions, minDate, dispatch } = useTicketStore(

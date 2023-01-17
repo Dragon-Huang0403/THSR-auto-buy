@@ -1,4 +1,4 @@
-import SwapVertIcon from '@mui/icons-material/SwapVert';
+import { SwapVert } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -11,70 +11,28 @@ import {
   styled,
   TextField,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { useState } from 'react';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 
 import { Select } from '../components/Select';
-import { useLifeCycleActor } from '../features/lifeCycleMachine';
-import type { StationName, TimeOption } from '../models/thsr';
-import { timeOptions } from '../models/thsr';
 import { stationObjects, stations } from '../models/thsr';
-import { getMinSearchTime, padTo2Digit } from '../utils/helper';
+import { useTicketStore } from '../store';
+import { BOOKING_METHODS, MAX_TIME, MIN_TIME } from '../utils/constants';
 import { getRandomTaiwanId } from '../utils/taiwanIdGenerator';
 import { trpc } from '../utils/trpc';
 
 const Form = styled('form')({});
 
-const bookingMethods = [
-  { value: 'time', label: '選擇時間' },
-  { value: 'trainNo', label: '輸入車次' },
-] as const;
-
 const PurchasePage = () => {
-  const [minDate] = useState(() => getMinSearchTime());
-  const { data: maxSearchDate } = trpc.time.availableDate.useQuery();
-  const purchaseTicketMutation = trpc.ticket.reserve.useMutation();
+  const { searchOptions, minDate, dispatch, userInfo, bookingOptions } =
+    useTicketStore();
+  const { data: maxDate } = trpc.time.availableDate.useQuery();
 
-  const [lifeCycleState, lifeCycleSend] = useLifeCycleActor();
-  const bookingOptions = lifeCycleState.context.bookingOptions;
-  const buyerInfo = lifeCycleState.context.buyerInfo;
-
-  const selectableTime = timeOptions.filter((option) => {
-    const now = new Date();
-    if (now.getDate() !== bookingOptions.toTimeInputField.getDate()) {
-      return true;
-    }
-    const date = new Date(bookingOptions.toTimeInputField);
-    date.setHours(option.time[0]);
-    date.setMinutes(option.time[1]);
-    return date >= now;
-  });
-  const [selectedTime, setSelectedTime] = useState(() => {
-    return timeOptions.find(
-      (option) => option.value === bookingOptions.toTimeTable,
-    ) as TimeOption;
-  });
-
-  const [bookingMethod, setBookingMethod] = useState<
-    typeof bookingMethods[number]['value']
-  >(() => (bookingOptions.toTrainIDInputField ? 'trainNo' : 'time'));
-
-  console.log(purchaseTicketMutation.data);
-
+  const purchaseTicket = trpc.ticket.reserve.useMutation();
   return (
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        purchaseTicketMutation.mutate({
-          ...lifeCycleState.context,
-          bookingOptions: {
-            ...lifeCycleState.context.bookingOptions,
-            toTrainIDInputField:
-              bookingMethod === 'trainNo'
-                ? lifeCycleState.context.bookingOptions.toTrainIDInputField
-                : '',
-          },
-        });
+        purchaseTicket.mutate({ searchOptions, bookingOptions, userInfo });
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >
@@ -89,22 +47,18 @@ const PurchasePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: Object.values(stationObjects).find(
-              (stationObject) =>
-                stationObject.value === bookingOptions.selectStartStation,
-            )?.name as StationName,
-            value: bookingOptions.selectStartStation,
+            label: stationObjects[searchOptions.startStation].name,
           }}
           onChange={(newOption) => {
-            lifeCycleSend({
-              type: 'UpdateBookingOptions',
-              data: {
-                selectStartStation: newOption.value,
+            dispatch({
+              type: 'searchOptions',
+              payload: {
+                startStation: newOption.value,
               },
             });
           }}
           options={stations.map((station) => ({
-            value: stationObjects[station].value,
+            value: station,
             label: stationObjects[station].name,
           }))}
         />
@@ -124,37 +78,33 @@ const PurchasePage = () => {
         >
           <IconButton
             onClick={() => {
-              lifeCycleSend({
-                type: 'UpdateBookingOptions',
-                data: {
-                  selectStartStation: bookingOptions.selectDestinationStation,
-                  selectDestinationStation: bookingOptions.selectStartStation,
+              dispatch({
+                type: 'searchOptions',
+                payload: {
+                  startStation: searchOptions.endStation,
+                  endStation: searchOptions.startStation,
                 },
               });
             }}
           >
-            <SwapVertIcon />
+            <SwapVert />
           </IconButton>
         </Box>
         <Select
           label="到達站"
           value={{
-            label: Object.values(stationObjects).find(
-              (stationObject) =>
-                stationObject.value === bookingOptions.selectDestinationStation,
-            )?.name as StationName,
-            value: bookingOptions.selectDestinationStation,
+            label: stationObjects[searchOptions.endStation].name,
           }}
           onChange={(newOption) => {
-            lifeCycleSend({
-              type: 'UpdateBookingOptions',
-              data: {
-                selectDestinationStation: newOption.value,
+            dispatch({
+              type: 'searchOptions',
+              payload: {
+                endStation: newOption.value,
               },
             });
           }}
           options={stations.map((station) => ({
-            value: stationObjects[station].value,
+            value: station,
             label: stationObjects[station].name,
           }))}
         />
@@ -162,39 +112,36 @@ const PurchasePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={bookingOptions.toTimeInputField}
+        value={searchOptions.searchDate}
         minDate={minDate}
-        maxDate={maxSearchDate}
+        maxDate={maxDate}
         onChange={(newValue) => {
           if (!newValue) return;
-          let newDate = new Date(bookingOptions.toTimeInputField);
-          newDate.setMonth(newValue.getMonth());
-          newDate.setDate(newValue.getDate());
-          const now = new Date();
-          if (newDate < now) {
-            newDate = getMinSearchTime();
-          }
-          lifeCycleSend({
-            type: 'UpdateBookingOptions',
-            data: {
-              toTimeInputField: newDate,
-            },
+          dispatch({
+            type: 'searchOptions',
+            payload: { searchDate: newValue },
           });
         }}
-        renderInput={(params) => <TextField {...params} helperText={null} />}
+        renderInput={(params) => (
+          <TextField id="input-date-picker" {...params} helperText={null} />
+        )}
       />
       <FormControl>
         <FormLabel>訂票方法</FormLabel>
         <RadioGroup
           row
-          value={bookingMethod}
+          value={bookingOptions.bookingMethod}
           onChange={(e, newMethod) => {
-            setBookingMethod(
-              newMethod as typeof bookingMethods[number]['value'],
-            );
+            dispatch({
+              type: 'bookingOptions',
+              payload: {
+                bookingMethod:
+                  newMethod as typeof BOOKING_METHODS[number]['value'],
+              },
+            });
           }}
         >
-          {bookingMethods.map((method) => (
+          {BOOKING_METHODS.map((method) => (
             <FormControlLabel
               key={method.value}
               value={method.value}
@@ -204,68 +151,62 @@ const PurchasePage = () => {
           ))}
         </RadioGroup>
       </FormControl>
-      {bookingMethod === 'time' && (
-        <Select
+      {bookingOptions.bookingMethod === 'time' && (
+        <TimePicker
+          renderInput={(params) => (
+            <TextField id="input-time-picker" {...params} />
+          )}
+          value={searchOptions.searchDate}
           label="選擇時間"
-          value={{
-            label: selectedTime.time.map((item) => padTo2Digit(item)).join(':'),
-            value: selectedTime,
-          }}
-          onChange={(newOption) => {
-            setSelectedTime(newOption.value);
-            lifeCycleSend({
-              type: 'UpdateBookingOptions',
-              data: {
-                toTimeTable: newOption.value.value,
-              },
+          ampm={false}
+          onChange={(newValue) => {
+            if (!newValue) return;
+            dispatch({
+              type: 'searchOptions',
+              payload: { searchDate: newValue },
             });
           }}
-          options={selectableTime.map((option) => ({
-            label: option.time.map((item) => padTo2Digit(item)).join(':'),
-            value: option,
-          }))}
+          minTime={MIN_TIME}
+          maxTime={MAX_TIME}
         />
       )}
-      {bookingMethod === 'trainNo' && (
+      {bookingOptions.bookingMethod === 'trainNo' && (
         <TextField
+          id="input-trainNo"
           required
-          label="選擇車次"
+          label="輸入車次"
           type={'number'}
-          value={bookingOptions.toTrainIDInputField}
+          value={bookingOptions.trainNo}
           onChange={(e) => {
-            lifeCycleSend({
-              type: 'UpdateBookingOptions',
-              data: {
-                toTrainIDInputField: e.target.value,
-              },
+            dispatch({
+              type: 'bookingOptions',
+              payload: { trainNo: e.target.value },
             });
           }}
         />
       )}
       <Box sx={{ display: 'flex', justifyContent: 'stretch', gap: 2 }}>
         <TextField
+          id="input-taiwanId"
           required
           label="身分證字號"
-          value={buyerInfo.dummyId}
+          value={userInfo.taiwanId}
           sx={{ flexGrow: 1 }}
           onChange={(e) => {
-            lifeCycleSend({
-              type: 'UpdateBuyerInfo',
-              data: {
-                dummyId: e.target.value,
-              },
+            dispatch({
+              type: 'userInfo',
+              payload: { taiwanId: e.target.value },
             });
           }}
         />
+
         <Button
           sx={{ height: '100%' }}
           onClick={() => {
             const randomId = getRandomTaiwanId();
-            lifeCycleSend({
-              type: 'UpdateBuyerInfo',
-              data: {
-                dummyId: randomId,
-              },
+            dispatch({
+              type: 'userInfo',
+              payload: { taiwanId: randomId },
             });
           }}
         >
@@ -273,32 +214,29 @@ const PurchasePage = () => {
         </Button>
       </Box>
       <TextField
+        id="input-email"
         label="E-mail"
-        value={buyerInfo.email}
+        value={userInfo.email}
         sx={{ flexGrow: 1 }}
         onChange={(e) => {
-          lifeCycleSend({
-            type: 'UpdateBuyerInfo',
-            data: {
-              email: e.target.value,
-            },
+          dispatch({
+            type: 'userInfo',
+            payload: { email: e.target.value },
           });
         }}
       />
       <TextField
+        id="input-phone"
         label="聯絡電話"
-        value={buyerInfo.dummyPhone}
+        value={userInfo.phone}
         sx={{ flexGrow: 1 }}
         onChange={(e) => {
-          lifeCycleSend({
-            type: 'UpdateBuyerInfo',
-            data: {
-              dummyPhone: e.target.value,
-            },
+          dispatch({
+            type: 'userInfo',
+            payload: { phone: e.target.value },
           });
         }}
       />
-
       <Button type="submit">立即訂票</Button>
     </Form>
   );
