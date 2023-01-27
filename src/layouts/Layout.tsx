@@ -19,10 +19,13 @@ const routes = [
   { href: '/history', name: '預約查詢' },
 ];
 export function Layout({ children }: LayoutProps) {
-  const router = useRouter();
-  const value = routes.find((route) =>
-    router.pathname.includes(route.href),
-  )?.href;
+  const { pathname } = useRouter();
+
+  const secondSlashIndex = [...pathname.matchAll(/\//g)][1]?.index;
+  const value = secondSlashIndex
+    ? pathname.slice(0, secondSlashIndex)
+    : pathname;
+
   return (
     <Container disableGutters sx={{ pt: 6, height: '100vh' }}>
       <AppBar>

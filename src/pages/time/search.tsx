@@ -24,7 +24,7 @@ import type { TicketStore } from '~/src/store';
 import { useTicketStore } from '~/src/store';
 import { CHINESE_DAYS } from '~/src/utils/constants';
 
-export type SearchPageQuery = Omit<
+export type TimeSearchQuery = Omit<
   TicketStore['searchOptions'],
   'searchDate'
 > & {
@@ -38,8 +38,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     transformer: superjson,
   });
 
-  const query = context.query as SearchPageQuery;
-  const searchDate = new Date(query.searchDate as string);
+  const query = context.query as TimeSearchQuery;
+  const searchDate = new Date(query.searchDate);
   const searchParams = {
     ...query,
     searchDate,

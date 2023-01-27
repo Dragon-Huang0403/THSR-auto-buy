@@ -1,4 +1,5 @@
 import type { HTMLElement } from 'node-html-parser';
+import { z } from 'zod';
 
 import type { CommonBookingOptions } from '~/src/models/thsr';
 
@@ -37,7 +38,19 @@ export function parsePurchaseResult(page: HTMLElement) {
       .map((paymentItem) => paymentItem.textContent.match(/\S+/gm)),
     totalPrice: page.getElementById('setTrainTotalPriceValue')?.textContent,
   };
-  return result;
+  const schema = z.object({
+    ticketId: z.string(),
+    payment: z.string(),
+    trainId: z.string(),
+    departureStation: z.string(),
+    departureTime: z.string(),
+    duration: z.string(),
+    arrivalStation: z.string(),
+    arrivalTime: z.string(),
+    seats: z.array(z.string()),
+    paymentDetails: z.array(z.array(z.string())),
+  });
+  return schema.parse(result);
 }
 
 export type PurchaseResult = ReturnType<typeof parsePurchaseResult>;

@@ -12,6 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { useRouter } from 'next/router';
 
 import { Select } from '../components/Select';
 import { stationObjects, stations } from '../models/thsr';
@@ -19,20 +20,41 @@ import { useTicketStore } from '../store';
 import { BOOKING_METHODS, MAX_TIME, MIN_TIME } from '../utils/constants';
 import { getRandomTaiwanId } from '../utils/taiwanIdGenerator';
 import { trpc } from '../utils/trpc';
+import type { HistorySearchQuery } from './history/search';
 
 const Form = styled('form')({});
 
 const PurchasePage = () => {
+  const utils = trpc.useContext();
+
   const { searchOptions, minDate, dispatch, userInfo, bookingOptions } =
     useTicketStore();
-  const { data: maxDate } = trpc.time.availableDate.useQuery();
 
+  const { data: maxDate } = trpc.time.availableDate.useQuery();
   const purchaseTicket = trpc.ticket.reserve.useMutation();
+
+  const router = useRouter();
+
   return (
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        purchaseTicket.mutate({ searchOptions, bookingOptions, userInfo });
+        purchaseTicket.mutate(
+          { searchOptions, bookingOptions, userInfo },
+          {
+            onSuccess(data) {
+              const historySearchQuery: HistorySearchQuery = {
+                taiwanId: userInfo.taiwanId,
+                orderId: data.ticketId ?? '',
+                searchMethod: 'purchased',
+              };
+              utils.ticket.history.setData(historySearchQuery, data);
+              router.push(
+                `/history/search?${new URLSearchParams(historySearchQuery)}`,
+              );
+            },
+          },
+        );
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >

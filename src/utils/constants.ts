@@ -7,3 +7,15 @@ export const BOOKING_METHODS = [
   { value: 'time', label: '選擇時間' },
   { value: 'trainNo', label: '輸入車次' },
 ] as const;
+
+export const HISTORY_SEARCH_METHODS = [
+  {
+    value: 'purchased',
+    label: '購買完成',
+  },
+  {
+    value: 'reserved',
+    label: '預約購買',
+  },
+] as const;
+export const HISTORY_SEARCH_METHOD_VALUES = ['purchased', 'reserved'] as const;

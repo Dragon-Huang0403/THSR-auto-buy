@@ -130,6 +130,9 @@ export type SearchBookedTicketRequest = {
    * 1: 護照/居留證/入出境許可證號碼
    */
   typesofid: 0 | 1;
+  /**
+   * TaiwanID
+   */
   rocId: string;
   orderId: string;
   'divCaptcha:securityCode': string;

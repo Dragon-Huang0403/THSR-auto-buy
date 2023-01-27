@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import { z } from 'zod';
 
 import { stationObjects, stations } from '~/src/models/thsr/constants';
+import { HISTORY_SEARCH_METHOD_VALUES } from '~/src/utils/constants';
 import { findNearestSelectedTime } from '~/src/utils/helper';
 import { checkTaiwanId } from '~/src/utils/taiwanIdGenerator';
 
@@ -79,13 +80,19 @@ export const ticketRouter = router({
   history: publicProcedure
     .input(
       z.object({
-        typesofid: z.union([z.literal(0), z.literal(1)]),
-        rocId: z.string(),
+        searchMethod: z.enum(HISTORY_SEARCH_METHOD_VALUES),
+        taiwanId: z
+          .string()
+          .refine(checkTaiwanId, { message: '身分證字號錯誤' }),
         orderId: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
-      const result = await ticketHistoryFlow(input);
-      console.log(result);
+    .query(async ({ input }) => {
+      const result = await ticketHistoryFlow({
+        typesofid: 0,
+        rocId: input.taiwanId,
+        orderId: input.orderId,
+      });
+      return result;
     }),
 });

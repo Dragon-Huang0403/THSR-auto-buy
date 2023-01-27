@@ -10,7 +10,7 @@ import { useTicketStore } from '~/src/store';
 import { MAX_TIME, MIN_TIME } from '~/src/utils/constants';
 import { trpc } from '~/src/utils/trpc';
 
-import type { SearchPageQuery } from './search';
+import type { TimeSearchQuery } from './search';
 
 const Form = styled('form')({});
 
@@ -31,7 +31,7 @@ const TimePage = () => {
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        const searchParams: SearchPageQuery = {
+        const searchParams: TimeSearchQuery = {
           ...searchOptions,
           searchDate: searchOptions.searchDate.toString(),
         };
