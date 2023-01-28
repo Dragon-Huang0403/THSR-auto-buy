@@ -10,13 +10,9 @@ const routes = [
   { href: '/time', name: '時刻表' },
   {
     href: '/',
-    name: '立即購票',
-  },
-  {
-    href: '/reserve',
     name: '預約訂票',
   },
-  { href: '/history', name: '預約查詢' },
+  { href: '/history', name: '訂票查詢' },
 ];
 export function Layout({ children }: LayoutProps) {
   const { pathname } = useRouter();

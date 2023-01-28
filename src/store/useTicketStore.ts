@@ -7,10 +7,10 @@ import type { BOOKING_METHODS } from '~/src/utils/constants';
 
 import type { Station } from '../models/thsr';
 import { stations } from '../models/thsr';
-import { getMinSearchTime } from '../utils/helper';
+import { getMinBookDate } from '../utils/helper';
 
 export type TicketStore = {
-  minDate: Date;
+  minBookDate: Date;
   searchOptions: {
     startStation: Station;
     endStation: Station;
@@ -33,7 +33,7 @@ export type TicketStore = {
     phone: string;
   };
   dispatch: <
-    OptionType extends Exclude<keyof TicketStore, 'minDate' | 'dispatch'>,
+    OptionType extends Exclude<keyof TicketStore, 'minBookDate' | 'dispatch'>,
   >(action: {
     type: OptionType;
     payload: Partial<TicketStore[OptionType]>;
@@ -43,13 +43,18 @@ export type TicketStore = {
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set) => {
-      const minDate = getMinSearchTime();
+      const minBookDate = getMinBookDate();
+      const now = new Date();
+      const searchDate = new Date(minBookDate);
+      searchDate.setHours(now.getHours());
+      searchDate.setMinutes(now.getMinutes());
+
       return {
-        minDate,
+        minBookDate,
         searchOptions: {
           startStation: stations[0],
           endStation: stations[1],
-          searchDate: minDate,
+          searchDate,
         },
         bookingOptions: {
           bookingMethod: 'time',
@@ -88,9 +93,15 @@ export const useTicketStore = create<TicketStore>()(
             setTimeout(res, 500);
           });
           const oldState = superjson.parse<StorageValue<TicketStore>>(str);
-          const minDate = getMinSearchTime();
-          if (minDate > oldState.state.searchOptions.searchDate) {
-            oldState.state.searchOptions.searchDate = minDate;
+
+          const minBookDate = getMinBookDate();
+          oldState.state.minBookDate = minBookDate;
+          if (oldState.state.searchOptions.searchDate < minBookDate) {
+            const now = new Date();
+            const searchDate = new Date(minBookDate);
+            searchDate.setHours(now.getHours());
+            searchDate.setMinutes(now.getMinutes());
+            oldState.state.searchOptions.searchDate = searchDate;
           }
           return oldState;
         },

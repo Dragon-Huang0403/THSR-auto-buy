@@ -19,3 +19,5 @@ export const HISTORY_SEARCH_METHODS = [
   },
 ] as const;
 export const HISTORY_SEARCH_METHOD_VALUES = ['purchased', 'reserved'] as const;
+
+export const MAX_BOOK_DAYS = 30;

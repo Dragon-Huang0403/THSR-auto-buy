@@ -32,6 +32,8 @@ export const stations = [
   'ZuoYing',
 ] as const;
 
+export const earlyBookDay = 28;
+
 export const stationValues = intRangeArray(1, 13);
 
 export const searchTypes = {

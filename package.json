@@ -9,11 +9,11 @@
     "lint": "tsc --noEmit && next lint",
     "start": "next start",
     "prepare": "husky install",
-    "migrate": "prisma migrate dev --name $NAME && pnpm install",
-    "seed": "tsx ./prisma/seed.ts"
+    "migrate": "NODE_ENV=development prisma migrate dev --name $NAME && pnpm install",
+    "seed": "NODE_ENV=development prisma db seed"
   },
   "prisma": {
-    "seed": "pnpm seed"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",

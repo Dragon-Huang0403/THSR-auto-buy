@@ -1,37 +1,30 @@
-import { PrismaClient } from '@prisma/client';
-
+import { stations } from '~/src/models/thsr';
+import { prisma } from '~/src/server/db/client';
+import { getAvailableDate } from '~/src/server/THSR/utils/searchApis';
+import { getBookDate } from '~/src/utils/helper';
 import { getRandomTaiwanId } from '~/src/utils/taiwanIdGenerator';
-const prisma = new PrismaClient();
 
-function getDateWithNDaysLater(days: number) {
-  const date = new Date();
-  date.setTime(date.getTime() + 1000 * 60 * 60 * 24 * days);
-  return date;
-}
 async function main() {
-  const after35Days = getDateWithNDaysLater(35);
+  const searchDate = await getAvailableDate();
+  const bookDate = getBookDate(searchDate);
 
-  const dummyTickets = await prisma.ticketsByDate.create({
+  const result = await prisma.reservation.create({
     data: {
-      selectStartStation: '1',
-      selectDestinationStation: '10',
-      trainRadioGroup: 0,
-      typesoftrip: 0,
-      seatRadioGroup: 0,
-      toTimeInputField: after35Days,
-      adultTicketValue: 1,
-      childTicketValue: 0,
-      disabledTicketValue: 0,
-      elderTicketValue: 0,
-      collegeTicketValue: 0,
-      dummyId: getRandomTaiwanId(),
-      dummyPhone: '',
+      startStation: stations[0],
+      endStation: stations[11],
+      searchDate,
+      adult: 1,
+      child: 0,
+      disabled: 0,
+      elder: 0,
+      college: 0,
+      taiwanId: getRandomTaiwanId(),
       email: '',
-      buyNthTrainItem: 0,
-      toTimeTable: '1000A',
+      phone: '',
+      bookDate,
     },
   });
-  console.log(dummyTickets);
+  console.log(result);
 }
 main()
   .then(async () => {
