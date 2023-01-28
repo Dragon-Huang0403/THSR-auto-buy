@@ -14,7 +14,6 @@ const bookAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const tickets = await prisma.reservation.findMany({
     where: { bookDate: { lte: new Date() }, hasBook: false },
   });
-  console.log(tickets);
 
   const results = await Promise.all(
     tickets.map(async (ticket) => {
@@ -73,7 +72,7 @@ const bookAll = async (req: NextApiRequest, res: NextApiResponse) => {
       return ticketResult;
     }),
   );
-  console.log(results);
+
   res.status(200).json(results);
 };
 

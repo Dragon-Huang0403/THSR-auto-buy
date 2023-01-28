@@ -47,6 +47,7 @@ export function getBookDate(targetDate: Date) {
 
   targetDate.setHours(0);
   targetDate.setMinutes(0);
+  targetDate.setSeconds(0);
   targetDate.setMilliseconds(0);
 
   const bookDate = subDays(targetDate, earlyBookDay);

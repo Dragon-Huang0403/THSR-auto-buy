@@ -8,16 +8,11 @@ export const BOOKING_METHODS = [
   { value: 'trainNo', label: '輸入車次' },
 ] as const;
 
-export const HISTORY_SEARCH_METHODS = [
+export const MAX_BOOK_DAYS = 30;
+
+export const ticketTypes = [
   {
-    value: 'purchased',
-    label: '購買完成',
-  },
-  {
-    value: 'reserved',
-    label: '預約購買',
+    value: 'adult',
+    name: '全票',
   },
 ] as const;
-export const HISTORY_SEARCH_METHOD_VALUES = ['purchased', 'reserved'] as const;
-
-export const MAX_BOOK_DAYS = 30;
