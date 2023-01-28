@@ -10,7 +10,8 @@
     "start": "next start",
     "prepare": "husky install",
     "migrate": "NODE_ENV=development prisma migrate dev --name $NAME && pnpm install",
-    "seed": "NODE_ENV=development prisma db seed"
+    "seed": "NODE_ENV=development prisma db seed",
+    "bookall": "NODE_ENV=development tsx scripts/bookall.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
