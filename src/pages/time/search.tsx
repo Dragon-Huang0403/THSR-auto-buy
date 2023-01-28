@@ -139,6 +139,7 @@ function SearchPage({
           const discount = trainItem.Discount.map(
             (item) => `${item.Name} ${item.Value}`,
           ).join('，');
+
           return (
             <Box
               key={trainItem.TrainNumber}
@@ -156,7 +157,10 @@ function SearchPage({
                 });
                 dispatch({
                   type: 'searchOptions',
-                  payload: searchOptions,
+                  payload: {
+                    startStation: searchOptions.startStation,
+                    endStation: searchOptions.endStation,
+                  },
                 });
                 router.push('/');
               }}
@@ -194,17 +198,17 @@ function SearchPage({
                   display: 'flex',
                   justifyContent: 'space-between',
                   borderTop: (theme) => `1px solid ${theme.palette.grey[400]}`,
-                  pl: 2,
-                  px: 1.5,
+                  px: 1,
                   pt: 0.5,
                   pb: 1,
+                  gao: 1,
                 }}
               >
-                <Typography variant="body2" sx={{ ml: 1 }}>
-                  {discount}
-                </Typography>
+                <Typography variant="body2">{discount}</Typography>
+                <Typography variant="body2">{trainItem.Note}</Typography>
                 <Box
                   sx={{
+                    ml: 'auto',
                     display: 'flex',
                     gap: 0.5,
                     alignItems: 'center',

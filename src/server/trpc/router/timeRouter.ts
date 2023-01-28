@@ -28,15 +28,37 @@ export const timeRouter = router({
       }
 
       try {
-        const response = await postTHSRTimeTable({
-          SearchType: 'S',
-          Lang: 'TW',
-          StartStation: input.startStation,
-          EndStation: input.endStation,
-          OutWardSearchDate: format(input.searchDate, 'yyyy/MM/dd'),
-          OutWardSearchTime: format(input.searchDate, 'HH:mm'),
-          DiscountType: discountType.all,
-        });
+        const [response, discounts] = await Promise.all([
+          postTHSRTimeTable({
+            SearchType: 'S',
+            Lang: 'TW',
+            StartStation: input.startStation,
+            EndStation: input.endStation,
+            OutWardSearchDate: format(input.searchDate, 'yyyy/MM/dd'),
+            OutWardSearchTime: format(input.searchDate, 'HH:mm'),
+          }),
+          postTHSRTimeTable({
+            SearchType: 'S',
+            Lang: 'TW',
+            StartStation: input.startStation,
+            EndStation: input.endStation,
+            OutWardSearchDate: format(input.searchDate, 'yyyy/MM/dd'),
+            OutWardSearchTime: format(input.searchDate, 'HH:mm'),
+            DiscountType: discountType.all,
+          }),
+        ]);
+        response.DepartureTable.TrainItem =
+          response.DepartureTable.TrainItem.map((trainItem) => {
+            const target = discounts.DepartureTable.TrainItem.find(
+              (discountedTrainItem) =>
+                discountedTrainItem.TrainNumber === trainItem.TrainNumber,
+            );
+            if (target) {
+              trainItem.Discount = target.Discount;
+            }
+            return trainItem;
+          });
+
         return response;
       } catch (e) {
         console.error(e);

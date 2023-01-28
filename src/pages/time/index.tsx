@@ -2,6 +2,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { Box, Button, IconButton, styled, TextField } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { Select } from '~/src/components/Select';
@@ -15,10 +16,11 @@ import type { TimeSearchQuery } from './search';
 const Form = styled('form')({});
 
 const TimePage = () => {
-  const { searchOptions, minDate, dispatch } = useTicketStore(
+  const [now] = useState(() => new Date());
+  const [searchDate, setSearchDate] = useState(now);
+  const { searchOptions, dispatch } = useTicketStore(
     (state) => ({
       searchOptions: state.searchOptions,
-      minDate: state.minDate,
       dispatch: state.dispatch,
     }),
     shallow,
@@ -33,7 +35,7 @@ const TimePage = () => {
         e.preventDefault();
         const searchParams: TimeSearchQuery = {
           ...searchOptions,
-          searchDate: searchOptions.searchDate.toString(),
+          searchDate: searchDate.toString(),
         };
         router.push(`/time/search?${new URLSearchParams(searchParams)}`);
       }}
@@ -115,29 +117,23 @@ const TimePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={searchOptions.searchDate}
-        minDate={minDate}
+        value={searchDate}
+        minDate={now}
         maxDate={maxDate}
         onChange={(newValue) => {
           if (!newValue) return;
-          dispatch({
-            type: 'searchOptions',
-            payload: { searchDate: newValue },
-          });
+          setSearchDate(newValue);
         }}
         renderInput={(params) => <TextField {...params} helperText={null} />}
       />
       <TimePicker
         renderInput={(params) => <TextField {...params} />}
-        value={searchOptions.searchDate}
+        value={searchDate}
         label="選擇時間"
         ampm={false}
         onChange={(newValue) => {
           if (!newValue) return;
-          dispatch({
-            type: 'searchOptions',
-            payload: { searchDate: newValue },
-          });
+          setSearchDate(newValue);
         }}
         minTime={MIN_TIME}
         maxTime={MAX_TIME}
