@@ -44,7 +44,10 @@ export const ticketRouter = router({
           ...input.searchOptions,
           ...input.bookingOptions.ticketCounts,
           ...input.userInfo,
-          trainNo: input.bookingOptions.trainNo || null,
+          trainNo:
+            (input.bookingOptions.bookingMethod === 'trainNo' &&
+              input.bookingOptions.trainNo) ||
+            null,
           bookDate,
         },
       });

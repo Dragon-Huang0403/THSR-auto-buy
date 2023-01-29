@@ -11,7 +11,8 @@
     "prepare": "husky install",
     "migrate": "NODE_ENV=development prisma migrate dev --name $NAME && pnpm install",
     "seed": "NODE_ENV=development prisma db seed",
-    "bookall": "NODE_ENV=development tsx scripts/bookall.ts"
+    "bookall": "NODE_ENV=development tsx scripts/bookall.ts",
+    "openapi": "pnpx openapi-typescript ./src/models/openapi/schema.json --output ./src/models/openapi/schema.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

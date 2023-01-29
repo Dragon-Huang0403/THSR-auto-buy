@@ -1,31 +1,26 @@
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { Box, Button, IconButton, styled, TextField } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { Select } from '~/src/components/Select';
 import { stationObjects, stations } from '~/src/models/thsr';
 import { useTicketStore } from '~/src/store';
-import { MAX_TIME, MIN_TIME } from '~/src/utils/constants';
-import { trpc } from '~/src/utils/trpc';
-
-import type { TimeSearchQuery } from './search';
+import { MAX_BOOK_DAYS, MAX_TIME, MIN_TIME } from '~/src/utils/constants';
 
 const Form = styled('form')({});
 
 const TimePage = () => {
-  const [now] = useState(() => new Date());
-  const [searchDate, setSearchDate] = useState(now);
-  const { searchOptions, dispatch } = useTicketStore(
+  const { searchOptions, dispatch, minBookDate } = useTicketStore(
     (state) => ({
       searchOptions: state.searchOptions,
+      minBookDate: state.minBookDate,
       dispatch: state.dispatch,
     }),
     shallow,
   );
-  const { data: maxDate } = trpc.time.availableDate.useQuery();
 
   const router = useRouter();
 
@@ -33,11 +28,7 @@ const TimePage = () => {
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        const searchParams: TimeSearchQuery = {
-          ...searchOptions,
-          searchDate: searchDate.toString(),
-        };
-        router.push(`/time/search?${new URLSearchParams(searchParams)}`);
+        router.push(`/time/search`);
       }}
       sx={{ display: 'grid', gap: 2, py: 4, px: 2 }}
     >
@@ -117,23 +108,29 @@ const TimePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={searchDate}
-        minDate={now}
-        maxDate={maxDate}
+        value={searchOptions.searchDate}
+        minDate={minBookDate}
+        maxDate={addDays(minBookDate, MAX_BOOK_DAYS)}
         onChange={(newValue) => {
           if (!newValue) return;
-          setSearchDate(newValue);
+          dispatch({
+            type: 'searchOptions',
+            payload: { searchDate: newValue },
+          });
         }}
         renderInput={(params) => <TextField {...params} helperText={null} />}
       />
       <TimePicker
         renderInput={(params) => <TextField {...params} />}
-        value={searchDate}
+        value={searchOptions.searchDate}
         label="選擇時間"
         ampm={false}
         onChange={(newValue) => {
           if (!newValue) return;
-          setSearchDate(newValue);
+          dispatch({
+            type: 'searchOptions',
+            payload: { searchDate: newValue },
+          });
         }}
         minTime={MIN_TIME}
         maxTime={MAX_TIME}
