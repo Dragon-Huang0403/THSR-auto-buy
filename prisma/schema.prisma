@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Reservation {
@@ -45,4 +46,6 @@ model TicketResult {
   errorMessage  String?
   reservationId String
   Reservation   Reservation @relation(fields: [reservationId], references: [id])
+
+  @@index([reservationId])
 }

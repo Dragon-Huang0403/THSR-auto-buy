@@ -9,7 +9,7 @@
     "lint": "tsc --noEmit && next lint",
     "start": "next start",
     "prepare": "husky install",
-    "migrate": "NODE_ENV=development prisma migrate dev --name $NAME && pnpm install",
+    "dbpush": "prisma db push",
     "seed": "NODE_ENV=development prisma db seed",
     "bookall": "NODE_ENV=development tsx scripts/bookall.ts",
     "openapi": "pnpx openapi-typescript ./src/models/openapi/schema.json --output ./src/models/openapi/schema.ts"
