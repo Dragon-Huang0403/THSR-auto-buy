@@ -9,6 +9,8 @@ import { ticketTypes } from '~/src/utils/constants';
 import type { RouterOutputs } from '~/src/utils/trpc';
 import { trpc } from '~/src/utils/trpc';
 
+import { useTicketStore } from '../store';
+
 const Form = styled('form')({});
 
 type ReservationProps = {
@@ -103,15 +105,19 @@ const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
 };
 
 const HistoryPage = () => {
-  const [taiwanId, setTaiwanId] = useState('');
-  const historyMutation = trpc.ticket.history.useMutation();
+  const _taiwanId = useTicketStore((state) => state.userInfo.taiwanId);
+  const [taiwanId, setTaiwanId] = useState(() => _taiwanId);
+  const history = trpc.ticket.history.useQuery(
+    { taiwanId },
+    { enabled: false },
+  );
 
   return (
     <Box>
       <Form
         onSubmit={(e) => {
           e.preventDefault();
-          historyMutation.mutate({ taiwanId });
+          history.refetch();
         }}
         sx={{ display: 'grid', gap: 2, pt: 4, px: 2 }}
       >
@@ -136,7 +142,7 @@ const HistoryPage = () => {
           height: '100%',
         }}
       >
-        {historyMutation.data?.map((reservation) => (
+        {history.data?.map((reservation) => (
           <Reservation
             key={reservation.id}
             reservation={reservation}

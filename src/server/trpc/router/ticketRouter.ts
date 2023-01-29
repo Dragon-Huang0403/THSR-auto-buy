@@ -61,7 +61,7 @@ export const ticketRouter = router({
           .refine(checkTaiwanId, { message: '身分證字號錯誤' }),
       }),
     )
-    .mutation(async ({ input }) => {
+    .query(async ({ input }) => {
       const result = prisma.reservation.findMany({
         where: {
           taiwanId: input.taiwanId,

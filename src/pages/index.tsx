@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { addDays } from 'date-fns';
+import { useRouter } from 'next/router';
 
 import { Select } from '../components/Select';
 import { stationObjects, stations } from '../models/thsr';
@@ -34,6 +35,8 @@ const ReservePage = () => {
 
   const reserve = trpc.ticket.reserve.useMutation();
 
+  const router = useRouter();
+  const utils = trpc.useContext();
   return (
     <Form
       onSubmit={(e) => {
@@ -45,8 +48,9 @@ const ReservePage = () => {
         };
 
         reserve.mutate(request, {
-          onSuccess(data) {
-            console.log(data);
+          onSuccess() {
+            router.push('/history');
+            utils.ticket.history.prefetch({ taiwanId: userInfo.taiwanId });
           },
         });
       }}
