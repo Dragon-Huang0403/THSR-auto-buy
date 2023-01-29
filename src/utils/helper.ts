@@ -32,7 +32,8 @@ export function intRangeArray<
   return arr as DropFirstFewInTuple<Min, EnumerateStringArray<Max, PostFix>>;
 }
 
-export function getBookDate(targetDate: Date) {
+export function getBookDate(date: Date) {
+  let targetDate = new Date(date);
   const specialBookDate = specialBookDates.find(
     (data) => targetDate >= data.min && targetDate <= data.max,
   );
