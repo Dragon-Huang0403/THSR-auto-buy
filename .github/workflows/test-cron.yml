@@ -20,4 +20,4 @@ jobs:
     steps:
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: curl ${{ env.TEST_URL }}
+        run: curl https://thsr-auto-buy.vercel.app/api/test
