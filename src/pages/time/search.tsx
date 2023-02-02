@@ -6,18 +6,17 @@ import {
   ScheduleRounded,
 } from '@mui/icons-material';
 import { Box, IconButton, Link, Typography } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { differenceInMinutes, format, subMinutes } from 'date-fns';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { shallow } from 'zustand/shallow';
 
 import type { ServiceDays } from '~/src/models/openapi/utils';
-import { getTimeTable } from '~/src/models/openapi/utils';
 import { stationObjects } from '~/src/models/thsr';
 import { useTicketStore } from '~/src/store';
 import { CHINESE_DAYS } from '~/src/utils/constants';
 import { padTo2Digit } from '~/src/utils/helper';
+import { trpc } from '~/src/utils/trpc';
 
 const SEARCH_BUFFER_MINUTES = 30;
 
@@ -45,9 +44,7 @@ function SearchPage() {
     shallow,
   );
 
-  const { data, error } = useQuery({
-    queryFn: () => getTimeTable(),
-    queryKey: ['timeTable'] as const,
+  const { data, error } = trpc.time.regular.useQuery(undefined, {
     staleTime: Infinity,
   });
 
@@ -149,7 +146,7 @@ function SearchPage() {
           CHINESE_DAYS[searchOptions.searchDate.getDay()]
         })`}
       </Typography>
-      {error && <Typography>{(error as Error).message}</Typography>}
+      {error && <Typography>{error.message}</Typography>}
       <Box
         sx={{
           display: 'flex',

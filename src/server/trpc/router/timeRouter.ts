@@ -2,6 +2,11 @@ import { TRPCError } from '@trpc/server';
 import { format } from 'date-fns';
 import { z } from 'zod';
 
+import {
+  getRefreshAccessToken,
+  getTimeTable,
+  token,
+} from '~/src/models/openapi/utils';
 import { discountType, stations } from '~/src/models/thsr';
 import {
   getAvailableDate,
@@ -68,6 +73,12 @@ export const timeRouter = router({
         });
       }
     }),
+  regular: publicProcedure.query(async () => {
+    if (token.expiredAt < new Date()) {
+      await getRefreshAccessToken();
+    }
+    return getTimeTable();
+  }),
   availableDate: publicProcedure
     .output(z.date())
     .query(() => getAvailableDate()),
