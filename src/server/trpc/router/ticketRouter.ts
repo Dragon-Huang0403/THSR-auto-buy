@@ -1,57 +1,29 @@
 import { z } from 'zod';
 
-import { stations } from '~/src/models/thsr/constants';
-import { prisma } from '~/src/server/db/client';
+import { reservationSchema } from '~/firestore/schema';
 import { getBookDate } from '~/src/utils/helper';
 import { checkTaiwanId } from '~/src/utils/taiwanIdGenerator';
 
 import { ticketHistoryFlow } from '../../THSR/ticketHistoryFlow';
 import { publicProcedure, router } from '../trpc';
+reservationSchema;
+import { addReservation, findReservations } from '~/src/server/db/firestore';
 
 export const ticketRouter = router({
   reserve: publicProcedure
     .input(
-      z.object({
-        searchOptions: z.object({
-          startStation: z.enum(stations),
-          endStation: z.enum(stations),
-          searchDate: z.date(),
-        }),
-        bookingOptions: z.object({
-          bookingMethod: z.enum(['trainNo', 'time']),
-          trainNo: z.string(),
-          ticketCounts: z.object({
-            adult: z.number().min(0).max(10),
-            child: z.number().min(0).max(10),
-            disabled: z.number().min(0).max(10),
-            elder: z.number().min(0).max(10),
-            college: z.number().min(0).max(10),
-          }),
-        }),
-        userInfo: z.object({
-          taiwanId: z
-            .string()
-            .refine(checkTaiwanId, { message: '身分證字號錯誤' }),
-          email: z.string().email().or(z.literal('')),
-          phone: z.string(),
-        }),
+      reservationSchema.omit({
+        id: true,
+        hasBook: true,
+        ticketResults: true,
+        createdAt: true,
+        updatedAt: true,
+        bookDate: true,
       }),
     )
     .mutation(async ({ input }) => {
-      const bookDate = getBookDate(input.searchOptions.searchDate);
-      const result = await prisma.reservation.create({
-        data: {
-          ...input.searchOptions,
-          ...input.bookingOptions.ticketCounts,
-          ...input.userInfo,
-          trainNo:
-            (input.bookingOptions.bookingMethod === 'trainNo' &&
-              input.bookingOptions.trainNo) ||
-            null,
-          bookDate,
-        },
-      });
-      return result;
+      const bookDate = getBookDate(input.searchDate);
+      await addReservation({ ...input, bookDate });
     }),
   history: publicProcedure
     .input(
@@ -62,17 +34,7 @@ export const ticketRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const result = prisma.reservation.findMany({
-        where: {
-          taiwanId: input.taiwanId,
-        },
-        include: {
-          ticketResults: true,
-        },
-        orderBy: {
-          searchDate: 'desc',
-        },
-      });
+      const result = findReservations(input.taiwanId);
       return result;
     }),
   ticketResult: publicProcedure

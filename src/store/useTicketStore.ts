@@ -3,83 +3,66 @@ import { create } from 'zustand';
 import type { StorageValue } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
 
-import type { BOOKING_METHODS } from '~/src/utils/constants';
+import type { ClientReservation } from '~/firestore/schema';
 
-import type { Station } from '../models/thsr';
 import { stations } from '../models/thsr';
 import { getMinBookDate } from '../utils/helper';
 
-export type TicketStore = {
+type StoreData = Omit<ClientReservation, 'bookDate'> & {
   minBookDate: Date;
-  searchOptions: {
-    startStation: Station;
-    endStation: Station;
-    searchDate: Date;
-  };
-  bookingOptions: {
-    bookingMethod: typeof BOOKING_METHODS[number]['value'];
-    trainNo: string;
-    ticketCounts: {
-      adult: number;
-      child: number;
-      disabled: number;
-      elder: number;
-      college: number;
-    };
-  };
-  userInfo: {
-    taiwanId: string;
-    email: string;
-    phone: string;
-  };
-  dispatch: <
-    OptionType extends Exclude<keyof TicketStore, 'minBookDate' | 'dispatch'>,
-  >(action: {
-    type: OptionType;
-    payload: Partial<TicketStore[OptionType]>;
-  }) => void;
 };
+
+export interface TicketStore extends StoreData {
+  dispatch: (action: {
+    payload: Partial<Omit<TicketStore, 'dispatch' | 'minBookDate'>>;
+  }) => void;
+}
+
+function getInitialStoreData(): StoreData {
+  const minBookDate = getMinBookDate();
+  const now = new Date();
+  const searchDate = new Date(minBookDate);
+  searchDate.setHours(now.getHours());
+  searchDate.setMinutes(now.getMinutes());
+  return {
+    minBookDate,
+
+    startStation: stations[0],
+    endStation: stations[1],
+    searchDate,
+
+    bookingMethod: 'time',
+    trainNo: '',
+    carType: 0,
+    seatType: 0,
+
+    adult: 1,
+    child: 0,
+    disabled: 0,
+    elder: 0,
+    college: 0,
+
+    taiwanId: '',
+    email: '',
+    phone: '',
+  };
+}
+const initialStoreData = getInitialStoreData();
 
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set) => {
-      const minBookDate = getMinBookDate();
-      const now = new Date();
-      const searchDate = new Date(minBookDate);
-      searchDate.setHours(now.getHours());
-      searchDate.setMinutes(now.getMinutes());
-
       return {
-        minBookDate,
-        searchOptions: {
-          startStation: stations[0],
-          endStation: stations[1],
-          searchDate,
-        },
-        bookingOptions: {
-          bookingMethod: 'time',
-          trainNo: '',
-          ticketCounts: {
-            adult: 1,
-            child: 0,
-            disabled: 0,
-            elder: 0,
-            college: 0,
-          },
-        },
-        userInfo: {
-          taiwanId: '',
-          email: '',
-          phone: '',
-        },
-        dispatch: ({ type, payload }) =>
-          set((prev) => ({
-            [type]: { ...prev[type], ...payload },
+        ...initialStoreData,
+        dispatch: ({ payload }) =>
+          set(() => ({
+            ...payload,
           })),
       };
     },
     {
       name: 'ticketStore',
+      version: 1,
       storage: {
         getItem: async (name) => {
           const str = localStorage.getItem(name);
@@ -92,16 +75,21 @@ export const useTicketStore = create<TicketStore>()(
           await new Promise((res) => {
             setTimeout(res, 500);
           });
+
           const oldState = superjson.parse<StorageValue<TicketStore>>(str);
+
+          if (oldState.version !== 1) {
+            return null;
+          }
 
           const minBookDate = getMinBookDate();
           oldState.state.minBookDate = minBookDate;
-          if (oldState.state.searchOptions.searchDate < minBookDate) {
+          if (oldState.state.searchDate < minBookDate) {
             const now = new Date();
             const searchDate = new Date(minBookDate);
             searchDate.setHours(now.getHours());
             searchDate.setMinutes(now.getMinutes());
-            oldState.state.searchOptions.searchDate = searchDate;
+            oldState.state.searchDate = searchDate;
           }
           return oldState;
         },

@@ -5,18 +5,12 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "postinstall": "prisma generate",
     "lint": "tsc --noEmit && next lint",
     "start": "next start",
     "prepare": "husky install",
-    "dbpush": "prisma db push",
-    "seed": "NODE_ENV=development prisma db seed",
     "bookall": "NODE_ENV=development tsx scripts/bookall.ts",
     "openapi": "pnpx openapi-typescript ./src/models/openapi/schema.json --output ./src/models/openapi/schema.ts",
     "deploy": "vercel deploy"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
@@ -27,7 +21,6 @@
     "@mui/material": "^5.11.4",
     "@mui/x-date-pickers": "^5.0.13",
     "@next/font": "^13.1.2",
-    "@prisma/client": "^4.5.0",
     "@tanstack/react-query": "^4.16.0",
     "@trpc/client": "^10.0.0",
     "@trpc/next": "^10.0.0",
@@ -36,6 +29,7 @@
     "@xstate/react": "^3.0.1",
     "axios": "^1.2.2",
     "date-fns": "^2.29.3",
+    "firebase": "^9.16.0",
     "next": "13.1.1",
     "next-superjson-plugin": "^0.5.4",
     "react": "18.2.0",
@@ -61,7 +55,6 @@
     "husky": "^8.0.0",
     "node-html-parser": "^6.1.4",
     "prettier": "^2.8.1",
-    "prisma": "^4.5.0",
     "prompt-sync": "^4.2.0",
     "terminal-image": "^2.0.0",
     "tough-cookie": "^4.1.2",

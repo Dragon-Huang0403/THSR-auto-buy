@@ -105,7 +105,7 @@ const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
 };
 
 const HistoryPage = () => {
-  const _taiwanId = useTicketStore((state) => state.userInfo.taiwanId);
+  const _taiwanId = useTicketStore((state) => state.taiwanId);
   const [taiwanId, setTaiwanId] = useState(() => _taiwanId);
   const history = trpc.ticket.history.useQuery(
     { taiwanId },

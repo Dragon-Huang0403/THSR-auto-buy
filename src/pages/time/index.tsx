@@ -13,14 +13,17 @@ import { MAX_BOOK_DAYS, MAX_TIME, MIN_TIME } from '~/src/utils/constants';
 const Form = styled('form')({});
 
 const TimePage = () => {
-  const { searchOptions, dispatch, minBookDate } = useTicketStore(
-    (state) => ({
-      searchOptions: state.searchOptions,
-      minBookDate: state.minBookDate,
-      dispatch: state.dispatch,
-    }),
-    shallow,
-  );
+  const { startStation, endStation, searchDate, dispatch, minBookDate } =
+    useTicketStore(
+      (state) => ({
+        startStation: state.startStation,
+        endStation: state.endStation,
+        searchDate: state.searchDate,
+        minBookDate: state.minBookDate,
+        dispatch: state.dispatch,
+      }),
+      shallow,
+    );
 
   const router = useRouter();
 
@@ -43,11 +46,10 @@ const TimePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: stationObjects[searchOptions.startStation].name,
+            label: stationObjects[startStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
-              type: 'searchOptions',
               payload: {
                 startStation: newOption.value,
               },
@@ -75,10 +77,9 @@ const TimePage = () => {
           <IconButton
             onClick={() => {
               dispatch({
-                type: 'searchOptions',
                 payload: {
-                  startStation: searchOptions.endStation,
-                  endStation: searchOptions.startStation,
+                  endStation,
+                  startStation,
                 },
               });
             }}
@@ -89,11 +90,10 @@ const TimePage = () => {
         <Select
           label="到達站"
           value={{
-            label: stationObjects[searchOptions.endStation].name,
+            label: stationObjects[endStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
-              type: 'searchOptions',
               payload: {
                 endStation: newOption.value,
               },
@@ -108,13 +108,12 @@ const TimePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={searchOptions.searchDate}
+        value={searchDate}
         minDate={minBookDate}
         maxDate={addDays(minBookDate, MAX_BOOK_DAYS)}
         onChange={(newValue) => {
           if (!newValue) return;
           dispatch({
-            type: 'searchOptions',
             payload: { searchDate: newValue },
           });
         }}
@@ -122,13 +121,12 @@ const TimePage = () => {
       />
       <TimePicker
         renderInput={(params) => <TextField {...params} />}
-        value={searchOptions.searchDate}
+        value={searchDate}
         label="選擇時間"
         ampm={false}
         onChange={(newValue) => {
           if (!newValue) return;
           dispatch({
-            type: 'searchOptions',
             payload: { searchDate: newValue },
           });
         }}

@@ -35,9 +35,11 @@ function getDayOfWeek(date: Date): ServiceDays {
 function SearchPage() {
   const router = useRouter();
 
-  const { searchOptions, dispatch } = useTicketStore(
+  const { startStation, endStation, searchDate, dispatch } = useTicketStore(
     (state) => ({
-      searchOptions: state.searchOptions,
+      startStation: state.startStation,
+      endStation: state.endStation,
+      searchDate: state.searchDate,
       minBookDate: state.minBookDate,
       dispatch: state.dispatch,
     }),
@@ -49,9 +51,9 @@ function SearchPage() {
   });
 
   const goNorth =
-    Number(stationObjects[searchOptions.startStation].value) >
-    Number(stationObjects[searchOptions.endStation].value);
-  const stationIDs = [searchOptions.startStation, searchOptions.endStation].map(
+    Number(stationObjects[startStation].value) >
+    Number(stationObjects[endStation].value);
+  const stationIDs = [startStation, endStation].map(
     (station) => stationObjects[station].id,
   );
 
@@ -75,10 +77,7 @@ function SearchPage() {
         trainItem.GeneralTimetable.StopTimes.find(
           (stopTime) => stopTime.StationID === stationIDs[0],
         )?.DepartureTime ?? '';
-      const offsetSearchDate = subMinutes(
-        searchOptions.searchDate,
-        SEARCH_BUFFER_MINUTES,
-      );
+      const offsetSearchDate = subMinutes(searchDate, SEARCH_BUFFER_MINUTES);
       const searchDateTime = format(offsetSearchDate, 'hh:mm');
       if (departureTime < searchDateTime) {
         return false;
@@ -87,7 +86,7 @@ function SearchPage() {
       if (trainItem.GeneralTimetable.GeneralTrainInfo.TrainNo[0] === '0') {
         return true;
       }
-      const dayOfWeek = getDayOfWeek(searchOptions.searchDate);
+      const dayOfWeek = getDayOfWeek(searchDate);
       if (!trainItem.GeneralTimetable.ServiceDay[dayOfWeek]) {
         return false;
       }
@@ -134,16 +133,14 @@ function SearchPage() {
           <ArrowBackRounded />
         </IconButton>
         <Typography variant="h5">
-          {stationObjects[searchOptions.startStation].name}
+          {stationObjects[startStation].name}
         </Typography>
         <KeyboardDoubleArrowRightRounded fontSize="large" />
-        <Typography variant="h5">
-          {stationObjects[searchOptions.endStation].name}
-        </Typography>
+        <Typography variant="h5">{stationObjects[endStation].name}</Typography>
       </Box>
       <Typography variant="body2" sx={{ ml: 2.5 }}>
-        {`${format(searchOptions.searchDate, 'yyyy/MM/dd')} (${
-          CHINESE_DAYS[searchOptions.searchDate.getDay()]
+        {`${format(searchDate, 'yyyy/MM/dd')} (${
+          CHINESE_DAYS[searchDate.getDay()]
         })`}
       </Typography>
       {error && <Typography>{error.message}</Typography>}
@@ -168,7 +165,6 @@ function SearchPage() {
             }}
             onClick={() => {
               dispatch({
-                type: 'bookingOptions',
                 payload: {
                   bookingMethod: 'trainNo',
                   trainNo: trainItem.trainNo,

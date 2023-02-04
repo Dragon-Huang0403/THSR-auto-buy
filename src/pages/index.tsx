@@ -30,8 +30,7 @@ import { trpc } from '../utils/trpc';
 const Form = styled('form')({});
 
 const ReservePage = () => {
-  const { searchOptions, dispatch, userInfo, bookingOptions, minBookDate } =
-    useTicketStore();
+  const { dispatch, ...ticketStore } = useTicketStore();
 
   const reserve = trpc.ticket.reserve.useMutation();
 
@@ -41,16 +40,10 @@ const ReservePage = () => {
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        const request = {
-          searchOptions,
-          bookingOptions,
-          userInfo,
-        };
-
-        reserve.mutate(request, {
+        reserve.mutate(ticketStore, {
           onSuccess() {
             router.push('/history');
-            utils.ticket.history.prefetch({ taiwanId: userInfo.taiwanId });
+            utils.ticket.history.prefetch({ taiwanId: ticketStore.taiwanId });
           },
         });
       }}
@@ -67,11 +60,10 @@ const ReservePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: stationObjects[searchOptions.startStation].name,
+            label: stationObjects[ticketStore.startStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
-              type: 'searchOptions',
               payload: {
                 startStation: newOption.value,
               },
@@ -99,10 +91,9 @@ const ReservePage = () => {
           <IconButton
             onClick={() => {
               dispatch({
-                type: 'searchOptions',
                 payload: {
-                  startStation: searchOptions.endStation,
-                  endStation: searchOptions.startStation,
+                  startStation: ticketStore.endStation,
+                  endStation: ticketStore.startStation,
                 },
               });
             }}
@@ -113,11 +104,10 @@ const ReservePage = () => {
         <Select
           label="到達站"
           value={{
-            label: stationObjects[searchOptions.endStation].name,
+            label: stationObjects[ticketStore.endStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
-              type: 'searchOptions',
               payload: {
                 endStation: newOption.value,
               },
@@ -132,13 +122,12 @@ const ReservePage = () => {
       <DatePicker
         views={['day']}
         label="選擇日期"
-        value={searchOptions.searchDate}
-        minDate={minBookDate}
-        maxDate={addDays(minBookDate, MAX_BOOK_DAYS)}
+        value={ticketStore.searchDate}
+        minDate={ticketStore.minBookDate}
+        maxDate={addDays(ticketStore.minBookDate, MAX_BOOK_DAYS)}
         onChange={(newValue) => {
           if (!newValue) return;
           dispatch({
-            type: 'searchOptions',
             payload: { searchDate: newValue },
           });
         }}
@@ -150,10 +139,9 @@ const ReservePage = () => {
         <FormLabel>訂票方法</FormLabel>
         <RadioGroup
           row
-          value={bookingOptions.bookingMethod}
+          value={ticketStore.bookingMethod}
           onChange={(e, newMethod) => {
             dispatch({
-              type: 'bookingOptions',
               payload: {
                 bookingMethod:
                   newMethod as typeof BOOKING_METHODS[number]['value'],
@@ -171,18 +159,17 @@ const ReservePage = () => {
           ))}
         </RadioGroup>
       </FormControl>
-      {bookingOptions.bookingMethod === 'time' && (
+      {ticketStore.bookingMethod === 'time' && (
         <TimePicker
           renderInput={(params) => (
             <TextField id="input-time-picker" {...params} />
           )}
-          value={searchOptions.searchDate}
+          value={ticketStore.searchDate}
           label="選擇時間"
           ampm={false}
           onChange={(newValue) => {
             if (!newValue) return;
             dispatch({
-              type: 'searchOptions',
               payload: { searchDate: newValue },
             });
           }}
@@ -190,16 +177,15 @@ const ReservePage = () => {
           maxTime={MAX_TIME}
         />
       )}
-      {bookingOptions.bookingMethod === 'trainNo' && (
+      {ticketStore.bookingMethod === 'trainNo' && (
         <TextField
           id="input-trainNo"
           required
           label="輸入車次"
           type={'number'}
-          value={bookingOptions.trainNo}
+          value={ticketStore.trainNo}
           onChange={(e) => {
             dispatch({
-              type: 'bookingOptions',
               payload: { trainNo: e.target.value },
             });
           }}
@@ -210,11 +196,10 @@ const ReservePage = () => {
           id="input-taiwanId"
           required
           label="身分證字號"
-          value={userInfo.taiwanId}
+          value={ticketStore.taiwanId}
           sx={{ flexGrow: 1 }}
           onChange={(e) => {
             dispatch({
-              type: 'userInfo',
               payload: { taiwanId: e.target.value },
             });
           }}
@@ -225,7 +210,6 @@ const ReservePage = () => {
           onClick={() => {
             const randomId = getRandomTaiwanId();
             dispatch({
-              type: 'userInfo',
               payload: { taiwanId: randomId },
             });
           }}
@@ -236,11 +220,10 @@ const ReservePage = () => {
       <TextField
         id="input-email"
         label="E-mail"
-        value={userInfo.email}
+        value={ticketStore.email}
         sx={{ flexGrow: 1 }}
         onChange={(e) => {
           dispatch({
-            type: 'userInfo',
             payload: { email: e.target.value },
           });
         }}
@@ -248,11 +231,10 @@ const ReservePage = () => {
       <TextField
         id="input-phone"
         label="聯絡電話"
-        value={userInfo.phone}
+        value={ticketStore.phone}
         sx={{ flexGrow: 1 }}
         onChange={(e) => {
           dispatch({
-            type: 'userInfo',
             payload: { phone: e.target.value },
           });
         }}
