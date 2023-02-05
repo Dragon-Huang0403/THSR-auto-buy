@@ -6,9 +6,7 @@ import { z } from 'zod';
  * This way you can ensure the app isn't built with invalid env vars.
  */
 export const serverSchema = z.object({
-  DATABASE_URL: z.string().url(),
   NODE_ENV: z.enum(['development', 'test', 'production']),
-  CAPTCHA_KEY: z.string(),
   TDX_CLIENT_ID: z.string(),
   TDX_CLIENT_SECRET: z.string(),
 });
