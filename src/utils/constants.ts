@@ -10,9 +10,11 @@ export const BOOKING_METHODS = [
 
 export const MAX_BOOK_DAYS = 30;
 
-export const ticketTypes = [
+export const TICKET_TYPES = [
   {
     value: 'adult',
     name: '全票',
   },
 ] as const;
+
+export const EARLY_BOOK_DAY = 28;

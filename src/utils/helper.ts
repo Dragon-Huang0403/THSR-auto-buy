@@ -1,23 +1,11 @@
 import { addDays, getISODay, setDay, subDays } from 'date-fns';
 
-import type { TimeOption } from '../models/thsr';
-import { earlyBookDay } from '../models/thsr';
-import { timeOptions } from '../models/thsr';
-import { specialBookDates } from '../models/thsr/specialBookDates';
+import { EARLY_BOOK_DAY } from './constants';
+import { specialBookDates } from './specialBookDates';
 import type { DropFirstFewInTuple, EnumerateStringArray } from './typeHelper';
 
 export function padTo2Digit(num: number) {
   return num.toString().padStart(2, '0');
-}
-
-export function findNearestSelectedTime(time: Date): TimeOption {
-  const findLatestTime = timeOptions.find(
-    (option) =>
-      (option.time[0] === time.getHours() &&
-        option.time[1] >= time.getMinutes()) ||
-      option.time[0] > time.getHours(),
-  );
-  return findLatestTime ?? timeOptions[0];
 }
 
 export function intRangeArray<
@@ -51,14 +39,14 @@ export function getBookDate(date: Date) {
   targetDate.setSeconds(0);
   targetDate.setMilliseconds(0);
 
-  const bookDate = subDays(targetDate, earlyBookDay);
+  const bookDate = subDays(targetDate, EARLY_BOOK_DAY);
 
   return bookDate;
 }
 
 export function getMinBookDate() {
   const now = new Date();
-  const minBookDate = addDays(now, earlyBookDay);
+  const minBookDate = addDays(now, EARLY_BOOK_DAY);
   while (getBookDate(minBookDate) < now) {
     minBookDate.setTime(minBookDate.getTime() + 1000 * 3600 * 24);
   }

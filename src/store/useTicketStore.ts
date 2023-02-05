@@ -3,9 +3,9 @@ import { create } from 'zustand';
 import type { StorageValue } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
 
+import { STATIONS } from '~/firestore/constants';
 import type { ClientReservation } from '~/firestore/schema';
 
-import { stations } from '../models/thsr';
 import { getMinBookDate } from '../utils/helper';
 
 type StoreData = Omit<ClientReservation, 'bookDate'> & {
@@ -27,8 +27,8 @@ function getInitialStoreData(): StoreData {
   return {
     minBookDate,
 
-    startStation: stations[0],
-    endStation: stations[1],
+    startStation: STATIONS[0],
+    endStation: STATIONS[1],
     searchDate,
 
     bookingMethod: 'time',

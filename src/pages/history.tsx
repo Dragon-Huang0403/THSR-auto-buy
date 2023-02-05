@@ -3,9 +3,8 @@ import { Box, Button, styled, TextField, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
-import type { Station } from '~/src/models/thsr';
-import { stationObjects } from '~/src/models/thsr';
-import { ticketTypes } from '~/src/utils/constants';
+import { STATION_OBJECTS } from '~/firestore/constants';
+import { TICKET_TYPES } from '~/src/utils/constants';
 import type { RouterOutputs } from '~/src/utils/trpc';
 import { trpc } from '~/src/utils/trpc';
 
@@ -15,17 +14,9 @@ const Form = styled('form')({});
 
 type ReservationProps = {
   reservation: RouterOutputs['ticket']['history'][number];
-  taiwanId: string;
 };
-const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
+const Reservation = ({ reservation }: ReservationProps) => {
   const ticketResult = reservation.ticketResults[0];
-  const { data: ticketData } = trpc.ticket.ticketResult.useQuery(
-    {
-      taiwanId,
-      ticketId: ticketResult?.ticketId as string,
-    },
-    { enabled: !!ticketResult?.ticketId },
-  );
 
   return (
     <Box
@@ -50,11 +41,11 @@ const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
       >
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="h6">
-            {stationObjects[reservation.startStation as Station].name}
+            {STATION_OBJECTS[reservation.startStation].name}
           </Typography>
           <EastRounded />
           <Typography variant="h6">
-            {stationObjects[reservation.endStation as Station].name}
+            {STATION_OBJECTS[reservation.endStation].name}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, placeItems: 'center' }}>
@@ -64,7 +55,7 @@ const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
           </Typography>
         </Box>
       </Box>
-      {ticketTypes.map((ticketType) => (
+      {TICKET_TYPES.map((ticketType) => (
         <Typography key={ticketType.value}>{`${ticketType.name} ${
           reservation[ticketType.value]
         } 張`}</Typography>
@@ -74,12 +65,9 @@ const Reservation = ({ reservation, taiwanId }: ReservationProps) => {
           {ticketResult.ticketId && (
             <>
               <Typography>{`車票號碼：${ticketResult.ticketId}`}</Typography>
-              <Typography>{`出發時間：${ticketData?.arrivalTime}`}</Typography>
-              <Typography>{`抵達時間：${ticketData?.departureTime}`}</Typography>
-              <Typography>
-                {ticketData?.paymentDetails.at(-1) ?? ' '}
-              </Typography>
-              <Typography>{ticketData?.payment ?? ' '}</Typography>
+              <Typography>{`出發時間：${ticketResult.arrivalTime}`}</Typography>
+              <Typography>{`抵達時間：${ticketResult.departureTime}`}</Typography>
+              <Typography>{ticketResult.payment}</Typography>
             </>
           )}
           {ticketResult.errorMessage && (
@@ -143,11 +131,7 @@ const HistoryPage = () => {
         }}
       >
         {history.data?.map((reservation) => (
-          <Reservation
-            key={reservation.id}
-            reservation={reservation}
-            taiwanId={taiwanId}
-          />
+          <Reservation key={reservation.id} reservation={reservation} />
         ))}
       </Box>
     </Box>

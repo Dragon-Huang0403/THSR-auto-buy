@@ -11,8 +11,8 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { shallow } from 'zustand/shallow';
 
+import { STATION_OBJECTS } from '~/firestore/constants';
 import type { ServiceDays } from '~/src/models/openapi/utils';
-import { stationObjects } from '~/src/models/thsr';
 import { useTicketStore } from '~/src/store';
 import { CHINESE_DAYS } from '~/src/utils/constants';
 import { padTo2Digit } from '~/src/utils/helper';
@@ -51,10 +51,10 @@ function SearchPage() {
   });
 
   const goNorth =
-    Number(stationObjects[startStation].value) >
-    Number(stationObjects[endStation].value);
+    Number(STATION_OBJECTS[startStation].id) >
+    Number(STATION_OBJECTS[endStation].id);
   const stationIDs = [startStation, endStation].map(
-    (station) => stationObjects[station].id,
+    (station) => STATION_OBJECTS[station].id,
   );
 
   const filteredTrainItems = data
@@ -133,10 +133,10 @@ function SearchPage() {
           <ArrowBackRounded />
         </IconButton>
         <Typography variant="h5">
-          {stationObjects[startStation].name}
+          {STATION_OBJECTS[startStation].name}
         </Typography>
         <KeyboardDoubleArrowRightRounded fontSize="large" />
-        <Typography variant="h5">{stationObjects[endStation].name}</Typography>
+        <Typography variant="h5">{STATION_OBJECTS[endStation].name}</Typography>
       </Box>
       <Typography variant="body2" sx={{ ml: 2.5 }}>
         {`${format(searchDate, 'yyyy/MM/dd')} (${

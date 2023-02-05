@@ -15,8 +15,9 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 
+import { STATION_OBJECTS, STATIONS } from '~/firestore/constants';
+
 import { Select } from '../components/Select';
-import { stationObjects, stations } from '../models/thsr';
 import { useTicketStore } from '../store';
 import {
   BOOKING_METHODS,
@@ -60,7 +61,7 @@ const ReservePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: stationObjects[ticketStore.startStation].name,
+            label: STATION_OBJECTS[ticketStore.startStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
@@ -69,9 +70,9 @@ const ReservePage = () => {
               },
             });
           }}
-          options={stations.map((station) => ({
+          options={STATIONS.map((station) => ({
             value: station,
-            label: stationObjects[station].name,
+            label: STATION_OBJECTS[station].name,
           }))}
         />
         <Box
@@ -104,7 +105,7 @@ const ReservePage = () => {
         <Select
           label="到達站"
           value={{
-            label: stationObjects[ticketStore.endStation].name,
+            label: STATION_OBJECTS[ticketStore.endStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
@@ -113,9 +114,9 @@ const ReservePage = () => {
               },
             });
           }}
-          options={stations.map((station) => ({
+          options={STATIONS.map((station) => ({
             value: station,
-            label: stationObjects[station].name,
+            label: STATION_OBJECTS[station].name,
           }))}
         />
       </Box>

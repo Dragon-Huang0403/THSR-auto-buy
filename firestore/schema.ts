@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { stations } from '../src/models/thsr';
+import { STATIONS } from './constants';
 
 export const ticketResultSchema = z.object({
   ticketId: z.string(),
@@ -12,8 +12,8 @@ export const ticketResultSchema = z.object({
 
 export const reservationSchema = z.object({
   id: z.string(),
-  startStation: z.enum(stations),
-  endStation: z.enum(stations),
+  startStation: z.enum(STATIONS),
+  endStation: z.enum(STATIONS),
   searchDate: z.date(),
   bookingMethod: z.enum(['trainNo', 'time']),
   trainNo: z.string(),

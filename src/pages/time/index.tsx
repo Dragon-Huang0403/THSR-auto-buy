@@ -5,8 +5,8 @@ import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 import { shallow } from 'zustand/shallow';
 
+import { STATION_OBJECTS, STATIONS } from '~/firestore/constants';
 import { Select } from '~/src/components/Select';
-import { stationObjects, stations } from '~/src/models/thsr';
 import { useTicketStore } from '~/src/store';
 import { MAX_BOOK_DAYS, MAX_TIME, MIN_TIME } from '~/src/utils/constants';
 
@@ -46,7 +46,7 @@ const TimePage = () => {
         <Select
           label="啟程站"
           value={{
-            label: stationObjects[startStation].name,
+            label: STATION_OBJECTS[startStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
@@ -55,9 +55,9 @@ const TimePage = () => {
               },
             });
           }}
-          options={stations.map((station) => ({
+          options={STATIONS.map((station) => ({
             value: station,
-            label: stationObjects[station].name,
+            label: STATION_OBJECTS[station].name,
           }))}
         />
         <Box
@@ -90,7 +90,7 @@ const TimePage = () => {
         <Select
           label="到達站"
           value={{
-            label: stationObjects[endStation].name,
+            label: STATION_OBJECTS[endStation].name,
           }}
           onChange={(newOption) => {
             dispatch({
@@ -99,9 +99,9 @@ const TimePage = () => {
               },
             });
           }}
-          options={stations.map((station) => ({
+          options={STATIONS.map((station) => ({
             value: station,
-            label: stationObjects[station].name,
+            label: STATION_OBJECTS[station].name,
           }))}
         />
       </Box>
