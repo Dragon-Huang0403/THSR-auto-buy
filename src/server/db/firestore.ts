@@ -40,7 +40,7 @@ export async function addReservation(data: ClientReservation) {
     createdAt: now,
     updatedAt: now,
     hasBook: false,
-    ticketResults: [],
+    ticketResult: null,
   };
   await setDoc(docRef, docData);
 }

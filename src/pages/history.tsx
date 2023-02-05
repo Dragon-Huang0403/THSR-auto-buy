@@ -16,17 +16,17 @@ type ReservationProps = {
   reservation: RouterOutputs['ticket']['history'][number];
 };
 const Reservation = ({ reservation }: ReservationProps) => {
-  const ticketResult = reservation.ticketResults[0];
+  const ticketResult = reservation.ticketResult;
 
   return (
     <Box
       sx={{
         bgcolor: (theme) =>
-          !!ticketResult?.ticketId
-            ? theme.palette.success.light
-            : !!ticketResult?.errorMessage
+          !ticketResult
+            ? theme.palette.grey[200]
+            : 'errorMessage' in ticketResult
             ? theme.palette.error.light
-            : theme.palette.grey[200],
+            : theme.palette.success.light,
         borderRadius: 2,
         py: 1,
         px: 2,
@@ -62,7 +62,7 @@ const Reservation = ({ reservation }: ReservationProps) => {
       ))}
       {ticketResult ? (
         <>
-          {ticketResult.ticketId && (
+          {'ticketId' in ticketResult && (
             <>
               <Typography>{`車票號碼：${ticketResult.ticketId}`}</Typography>
               <Typography>{`出發時間：${ticketResult.arrivalTime}`}</Typography>
@@ -70,7 +70,7 @@ const Reservation = ({ reservation }: ReservationProps) => {
               <Typography>{ticketResult.payment}</Typography>
             </>
           )}
-          {ticketResult.errorMessage && (
+          {'errorMessage' in ticketResult && (
             <Typography variant="body2">{ticketResult.errorMessage}</Typography>
           )}
         </>

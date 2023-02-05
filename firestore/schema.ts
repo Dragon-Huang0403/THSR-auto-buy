@@ -2,13 +2,14 @@ import { z } from 'zod';
 
 import { STATIONS } from './constants';
 
-export const ticketResultSchema = z.object({
-  ticketId: z.string(),
-  arrivalTime: z.string(),
-  departureTime: z.string(),
-  payment: z.string(),
-  errorMessage: z.string().optional(),
-});
+export const ticketResultSchema = z
+  .object({
+    ticketId: z.string(),
+    arrivalTime: z.string(),
+    departureTime: z.string(),
+    payment: z.string(),
+  })
+  .or(z.object({ errorMessage: z.string() }));
 
 export const reservationSchema = z.object({
   id: z.string(),
@@ -45,7 +46,7 @@ export const reservationSchema = z.object({
   college: z.number().min(0).max(10),
 
   hasBook: z.boolean(),
-  ticketResults: z.array(ticketResultSchema),
+  ticketResult: ticketResultSchema.or(z.null()),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -54,5 +55,5 @@ export type Reservation = z.infer<typeof reservationSchema>;
 export type TicketResult = z.infer<typeof ticketResultSchema>;
 export type ClientReservation = Omit<
   Reservation,
-  'id' | 'hasBook' | 'ticketResults' | 'createdAt' | 'updatedAt'
+  'id' | 'hasBook' | 'ticketResult' | 'createdAt' | 'updatedAt'
 >;
