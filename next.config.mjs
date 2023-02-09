@@ -5,6 +5,8 @@
  */
 !process.env.SKIP_ENV_VALIDATION && (await import('./src/env/server.mjs'));
 
+await import('./firestore/schema.mjs');
+
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,

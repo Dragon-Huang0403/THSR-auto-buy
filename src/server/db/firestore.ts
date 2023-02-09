@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore';
 import { z } from 'zod';
 
-import type { ClientReservation, Reservation } from '~/firestore/schema.mjs';
+import type { clientReservationSchema } from '~/firestore/schema.mjs';
 import { reservationSchema } from '~/firestore/schema.mjs';
 
 import { clientEnv } from '../../env/schema.mjs';
@@ -31,9 +31,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const TABLE_NAME = 'reservations';
 
-export async function addReservation(data: ClientReservation) {
+export async function addReservation(
+  data: z.infer<typeof clientReservationSchema>,
+) {
   const docRef = doc(collection(db, TABLE_NAME));
-  const docData: Reservation = {
+  const docData: z.infer<typeof reservationSchema> = {
     ...data,
     id: docRef.id,
     createdAt: new Date(),

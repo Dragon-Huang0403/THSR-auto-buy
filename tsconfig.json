@@ -27,8 +27,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "firestore/constants.mts",
-    "firestore/schema.mts"
+    "firestore/schema.mjs"
   ],
   "exclude": ["node_modules"]
 }

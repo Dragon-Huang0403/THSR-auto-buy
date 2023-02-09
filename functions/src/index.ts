@@ -4,9 +4,9 @@ import { Timestamp } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { z } from 'zod';
 
-import { STATION_OBJECTS } from '../../firestore/constants.mjs';
 import { reservationSchema } from '../../firestore/schema.mjs';
 import { bookingByDateFlow, bookingByTrainNoFlow } from './thsr/bookingFlow.js';
+import { STATION_OBJECTS } from './thsr/utils/constants.js';
 import { findNearestSelectedTime } from './thsr/utils/searchApis.js';
 
 // Start writing functions

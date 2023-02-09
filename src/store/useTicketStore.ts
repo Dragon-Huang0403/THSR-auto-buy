@@ -1,14 +1,15 @@
 import superjson from 'superjson';
+import type { z } from 'zod';
 import { create } from 'zustand';
 import type { StorageValue } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
 
-import { STATIONS } from '~/firestore/constants.mjs';
-import type { ClientReservation } from '~/firestore/schema.mjs';
+import type { clientReservationSchema } from '~/firestore/schema.mjs';
 
+import { STATIONS } from '../utils/constants';
 import { getMinBookDate } from '../utils/helper';
 
-type StoreData = Omit<ClientReservation, 'bookDate'> & {
+type StoreData = Omit<z.infer<typeof clientReservationSchema>, 'bookDate'> & {
   minBookDate: Date;
 };
 

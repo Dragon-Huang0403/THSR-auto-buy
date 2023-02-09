@@ -1,10 +1,8 @@
 import type {
-  STATION_OBJECTS,
-  STATIONS,
-} from '../../../../firestore/constants.mjs';
-import type {
   discountType,
   searchTypes,
+  STATION_OBJECTS,
+  STATIONS,
   timeOptions,
 } from '../utils/constants.js';
 

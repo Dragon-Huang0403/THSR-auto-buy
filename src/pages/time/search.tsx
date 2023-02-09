@@ -11,10 +11,9 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { STATION_OBJECTS } from '~/firestore/constants.mjs';
 import type { ServiceDays } from '~/src/models/openapi/utils';
 import { useTicketStore } from '~/src/store';
-import { CHINESE_DAYS } from '~/src/utils/constants';
+import { CHINESE_DAYS, STATION_OBJECTS } from '~/src/utils/constants';
 import { padTo2Digit } from '~/src/utils/helper';
 import { trpc } from '~/src/utils/trpc';
 

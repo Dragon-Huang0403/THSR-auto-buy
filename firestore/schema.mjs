@@ -1,7 +1,21 @@
+// @ts-check
 import { Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 
-import { STATIONS } from './constants.mjs';
+export const stationSchema = z.enum([
+  'NanGang',
+  'TaiPei',
+  'BanQiao',
+  'TaoYuan',
+  'XinZhu',
+  'MiaoLi',
+  'TaiZhong',
+  'ZhangHua',
+  'YunLin',
+  'JiaYi',
+  'TaiNan',
+  'ZuoYing',
+]);
 
 const dateTimeSchema = z
   .number()
@@ -25,8 +39,8 @@ export const ticketResultSchema = z
 
 export const reservationSchema = z.object({
   id: z.string(),
-  startStation: z.enum(STATIONS),
-  endStation: z.enum(STATIONS),
+  startStation: stationSchema,
+  endStation: stationSchema,
   searchDate: dateTimeSchema,
   bookingMethod: z.enum(['trainNo', 'time']),
   trainNo: z.string(),
@@ -71,9 +85,9 @@ export const reservationSchema = z.object({
   createdAt: dateTimeSchema,
 });
 
-export type Reservation = z.infer<typeof reservationSchema>;
-export type TicketResult = z.infer<typeof ticketResultSchema>;
-export type ClientReservation = Omit<
-  Reservation,
-  'id' | 'ticketResult' | 'createdAt' | 'updatedAt'
->;
+export const clientReservationSchema = reservationSchema.omit({
+  id: true,
+  ticketResult: true,
+  createdAt: true,
+  updatedAt: true,
+});

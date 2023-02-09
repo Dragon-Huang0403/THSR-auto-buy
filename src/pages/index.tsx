@@ -15,8 +15,6 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 
-import { STATION_OBJECTS, STATIONS } from '~/firestore/constants.mjs';
-
 import { Select } from '../components/Select';
 import { useTicketStore } from '../store';
 import {
@@ -24,6 +22,8 @@ import {
   MAX_BOOK_DAYS,
   MAX_TIME,
   MIN_TIME,
+  STATION_OBJECTS,
+  STATIONS,
 } from '../utils/constants';
 import { getRandomTaiwanId } from '../utils/taiwanIdGenerator';
 import { trpc } from '../utils/trpc';

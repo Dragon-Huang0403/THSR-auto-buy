@@ -3,8 +3,7 @@ import { Box, Button, styled, TextField, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
-import { STATION_OBJECTS } from '~/firestore/constants.mjs';
-import { TICKET_TYPES } from '~/src/utils/constants';
+import { STATION_OBJECTS, TICKET_TYPES } from '~/src/utils/constants';
 import type { RouterOutputs } from '~/src/utils/trpc';
 import { trpc } from '~/src/utils/trpc';
 

@@ -6,6 +6,7 @@
     "noUnusedLocals": true,
     "outDir": "lib",
     "sourceMap": true,
+    "allowJs": true,
     "strict": true,
     "target": "es2017",
     "moduleResolution": "node16"
