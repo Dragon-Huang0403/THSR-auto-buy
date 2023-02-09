@@ -15,7 +15,7 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 
-import { STATION_OBJECTS, STATIONS } from '~/firestore/constants';
+import { STATION_OBJECTS, STATIONS } from '~/firestore/constants.mjs';
 
 import { Select } from '../components/Select';
 import { useTicketStore } from '../store';

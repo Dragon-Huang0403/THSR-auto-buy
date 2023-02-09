@@ -5,7 +5,7 @@ import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 import { shallow } from 'zustand/shallow';
 
-import { STATION_OBJECTS, STATIONS } from '~/firestore/constants';
+import { STATION_OBJECTS, STATIONS } from '~/firestore/constants.mjs';
 import { Select } from '~/src/components/Select';
 import { useTicketStore } from '~/src/store';
 import { MAX_BOOK_DAYS, MAX_TIME, MIN_TIME } from '~/src/utils/constants';

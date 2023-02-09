@@ -3,9 +3,10 @@ import got from 'got';
 import type {
   PostTHSRTimeTableRequest,
   PostTHSRTimeTableResponse,
-} from '~/src/models/thsr';
-
-import { thsrUrls } from './config';
+  TimeOption,
+} from '../schema/searchSchema.js';
+import { thsrUrls } from './config.js';
+import { timeOptions } from './constants.js';
 
 export async function postTHSRTimeTable(request: PostTHSRTimeTableRequest) {
   const response = (await got
@@ -28,4 +29,14 @@ export async function getAvailableDate() {
   date.setHours(23);
   date.setMinutes(59);
   return date;
+}
+
+export function findNearestSelectedTime(time: Date): TimeOption {
+  const findLatestTime = timeOptions.find(
+    (option) =>
+      (option.time[0] === time.getHours() &&
+        option.time[1] >= time.getMinutes()) ||
+      option.time[0] > time.getHours(),
+  );
+  return findLatestTime ?? timeOptions[0];
 }

@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import type { StorageValue } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
 
-import { STATIONS } from '~/firestore/constants';
-import type { ClientReservation } from '~/firestore/schema';
+import { STATIONS } from '~/firestore/constants.mjs';
+import type { ClientReservation } from '~/firestore/schema.mjs';
 
 import { getMinBookDate } from '../utils/helper';
 

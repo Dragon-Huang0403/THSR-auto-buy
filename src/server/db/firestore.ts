@@ -12,8 +12,8 @@ import {
 } from 'firebase/firestore';
 import { z } from 'zod';
 
-import type { ClientReservation, Reservation } from '~/firestore/schema';
-import { reservationSchema } from '~/firestore/schema';
+import type { ClientReservation, Reservation } from '~/firestore/schema.mjs';
+import { reservationSchema } from '~/firestore/schema.mjs';
 
 import { clientEnv } from '../../env/schema.mjs';
 
@@ -33,13 +33,10 @@ const TABLE_NAME = 'reservations';
 
 export async function addReservation(data: ClientReservation) {
   const docRef = doc(collection(db, TABLE_NAME));
-  const now = new Date();
   const docData: Reservation = {
     ...data,
     id: docRef.id,
-    createdAt: now,
-    updatedAt: now,
-    hasBook: false,
+    createdAt: new Date(),
     ticketResult: null,
   };
   await setDoc(docRef, docData);

@@ -1,23 +1,19 @@
-import type { ValueOf } from 'next/dist/shared/lib/constants';
-
 import type {
-  adultTicketValues,
-  childTicketValues,
-  collegeTicketValues,
-  disabledTicketValues,
+  STATION_OBJECTS,
+  STATIONS,
+} from '../../../../firestore/constants.mjs';
+import type {
   discountType,
-  elderTicketValues,
   searchTypes,
-  stationObjects,
   timeOptions,
-} from './constants';
+} from '../utils/constants.js';
 
-type DiscountType = ValueOf<typeof discountType>;
+type DiscountType = typeof discountType[keyof typeof discountType];
 
-export type Stations = typeof stationObjects;
-export type Station = keyof Stations;
-export type StationName = ValueOf<Stations>['name'];
-export type StationValue = ValueOf<Stations>['value'];
+export type Station = typeof STATIONS[number];
+export type StationValue = typeof STATION_OBJECTS[Station]['value'];
+export type StationName = typeof STATION_OBJECTS[Station]['name'];
+
 type StationNo =
   | `0${Exclude<StationValue, '10' | '11' | '12'>}`
   | '10'
@@ -129,7 +125,7 @@ interface StationInfo {
 }
 
 interface Discount {
-  Id: ValueOf<DiscountType>;
+  Id: DiscountType;
   Name: string;
   Value: DiscountText;
   /**
@@ -151,12 +147,6 @@ interface Title {
    */
   TitleSplit2: string;
 }
-
-export type AdultTicketValue = typeof adultTicketValues[number];
-export type ChildTicketValue = typeof childTicketValues[number];
-export type DisabledTicketValue = typeof disabledTicketValues[number];
-export type ElderTicketValue = typeof elderTicketValues[number];
-export type CollegeTicketValue = typeof collegeTicketValues[number];
 
 export type TimeOption = typeof timeOptions[number];
 export type ToTimeTableValue = TimeOption['value'];

@@ -1,7 +1,6 @@
 import type { Got } from 'got';
 import got from 'got';
-
-import { env } from '~/src/env/server.mjs';
+import { z } from 'zod';
 
 /**
  * https://2captcha.com/2captcha-api#solving_normal_captcha
@@ -15,11 +14,17 @@ type SolveImageCaptchaResponse =
       request: string;
     };
 
+function getCaptchaApiKey() {
+  return z.string().parse(process.env.CAPTCHA_KEY);
+}
+
 async function sendSolveCaptchaRequest(base64Buffer: string) {
+  const apiKey = getCaptchaApiKey();
+
   const res = (await got
     .post('http://2captcha.com/in.php', {
       form: {
-        key: env.CAPTCHA_KEY,
+        key: apiKey,
         method: 'base64',
         body: base64Buffer,
         // tells the server to send the response as JSON
@@ -34,20 +39,19 @@ async function getSolveCaptchaResult(requestId: string) {
   let retry = 10;
   let delay = 5000;
   let response: SolveImageCaptchaResponse = { status: 0 };
+  const apiKey = getCaptchaApiKey();
 
-  console.time('Get Captcha Result');
   while (retry && response.status === 0) {
     await new Promise((resolve) => setTimeout(resolve, delay));
     response = await got
       .get(
-        `http://2captcha.com/res.php?key=${env.CAPTCHA_KEY}&action=get&id=${requestId}&json=1`,
+        `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=1`,
       )
       .json();
 
     delay = delay > 1000 ? delay - 1000 : delay;
     retry--;
   }
-  console.timeEnd('Get Captcha Result');
 
   return response;
 }

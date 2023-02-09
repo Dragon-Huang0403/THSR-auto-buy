@@ -1,17 +1,16 @@
 import type { Got } from 'got';
-import parse from 'node-html-parser';
+import { parse } from 'node-html-parser';
 
 import type {
   BookingByDateOptions,
-  BookingByTrainNoOptions as BookingByTrainNoOptions,
+  BookingByTrainNoOptions,
   BookingByTrainNoRequest,
   BuyerInfo,
   PostAvailableTrainsRequest,
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
-} from '~/src/models/thsr';
-
-import { getCaptchaResult } from './utils/captchaHelpers';
+} from './schema/bookingRequestSchema.js';
+import { getCaptchaResult } from './utils/captchaHelpers.js';
 import {
   availableTrainRequestFiller,
   bookingByTainIdRequestFiller,
@@ -19,13 +18,13 @@ import {
   getClient,
   submitTicketRequestFiller,
   thsrUrls,
-} from './utils/config';
+} from './utils/config.js';
 import {
   getPassengerAmount,
   parsePageErrors,
   parsePurchaseResult,
   parseTrains,
-} from './utils/parseHelper';
+} from './utils/parseHelper.js';
 
 export async function bookingByDateFlow(
   bookingOptions: BookingByDateOptions,

@@ -1,16 +1,15 @@
 import type { Got } from 'got';
-import parse from 'node-html-parser';
+import { parse } from 'node-html-parser';
 
-import type { SearchBookedTicketRequest } from '~/src/models/thsr';
-
-import { getCaptchaResult } from './utils/captchaHelpers';
+import type { SearchBookedTicketRequest } from './schema/bookingRequestSchema.js';
+import { getCaptchaResult } from './utils/captchaHelpers.js';
 import {
+  getClient,
   searchBookedTicketRequestFiller,
+  thsrUrls,
   visitHistoryPageResultFiller,
-} from './utils/config';
-import { getClient } from './utils/config';
-import { thsrUrls } from './utils/config';
-import { parsePageErrors, parsePurchaseResult } from './utils/parseHelper';
+} from './utils/config.js';
+import { parsePageErrors, parsePurchaseResult } from './utils/parseHelper.js';
 
 export async function ticketHistoryFlow(
   request: Omit<

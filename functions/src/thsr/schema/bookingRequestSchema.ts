@@ -1,9 +1,10 @@
-import type { StationValue, ToTimeTableValue } from './types';
+import type { StationValue, ToTimeTableValue } from './searchSchema.js';
 
 /**
  * 0 ~ 10
  */
 type TicketAmount<T extends string> = `${number}${T}`;
+
 export type CommonBookingOptions = {
   selectStartStation: StationValue;
   selectDestinationStation: StationValue;

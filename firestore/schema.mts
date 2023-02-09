@@ -1,21 +1,33 @@
+import { Timestamp } from 'firebase/firestore';
 import { z } from 'zod';
 
-import { STATIONS } from './constants';
+import { STATIONS } from './constants.mjs';
+
+const dateTimeSchema = z
+  .number()
+  .transform((val) => new Date(val))
+  .or(z.date());
 
 export const ticketResultSchema = z
   .object({
     ticketId: z.string(),
     arrivalTime: z.string(),
     departureTime: z.string(),
-    payment: z.string(),
+    totalPrice: z.number(),
+    updatedAt: dateTimeSchema,
   })
-  .or(z.object({ errorMessage: z.string() }));
+  .or(
+    z.object({
+      errorMessage: z.string(),
+      updatedAt: dateTimeSchema,
+    }),
+  );
 
 export const reservationSchema = z.object({
   id: z.string(),
   startStation: z.enum(STATIONS),
   endStation: z.enum(STATIONS),
-  searchDate: z.date(),
+  searchDate: dateTimeSchema,
   bookingMethod: z.enum(['trainNo', 'time']),
   trainNo: z.string(),
   /**
@@ -29,7 +41,17 @@ export const reservationSchema = z.object({
    * 2: Aisle Seat
    */
   seatType: z.literal(0).or(z.literal(1)).or(z.literal(2)),
-  bookDate: z.date(),
+  /**
+   * Only allow Date in runtime, but it will be store in firestore as Timestamp
+   */
+  bookDate: z
+    .instanceof(Timestamp)
+    .or(z.date())
+    .transform((value) =>
+      value instanceof Timestamp
+        ? new Timestamp(value.seconds, value.nanoseconds).toDate()
+        : value,
+    ),
   /**
    * User Info
    */
@@ -45,15 +67,13 @@ export const reservationSchema = z.object({
   elder: z.number().min(0).max(10),
   college: z.number().min(0).max(10),
 
-  hasBook: z.boolean(),
   ticketResult: ticketResultSchema.or(z.null()),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: dateTimeSchema,
 });
 
 export type Reservation = z.infer<typeof reservationSchema>;
 export type TicketResult = z.infer<typeof ticketResultSchema>;
 export type ClientReservation = Omit<
   Reservation,
-  'id' | 'hasBook' | 'ticketResult' | 'createdAt' | 'updatedAt'
+  'id' | 'ticketResult' | 'createdAt' | 'updatedAt'
 >;

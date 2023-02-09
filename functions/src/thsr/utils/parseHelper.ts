@@ -1,7 +1,7 @@
 import type { HTMLElement } from 'node-html-parser';
 import { z } from 'zod';
 
-import type { CommonBookingOptions } from '~/src/models/thsr';
+import type { CommonBookingOptions } from '../schema/bookingRequestSchema.js';
 
 export function parseTrains(page: HTMLElement) {
   const trainItemQuery = '.result-item input';

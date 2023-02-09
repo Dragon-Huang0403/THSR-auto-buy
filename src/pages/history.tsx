@@ -3,7 +3,7 @@ import { Box, Button, styled, TextField, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
-import { STATION_OBJECTS } from '~/firestore/constants';
+import { STATION_OBJECTS } from '~/firestore/constants.mjs';
 import { TICKET_TYPES } from '~/src/utils/constants';
 import type { RouterOutputs } from '~/src/utils/trpc';
 import { trpc } from '~/src/utils/trpc';
@@ -67,7 +67,7 @@ const Reservation = ({ reservation }: ReservationProps) => {
               <Typography>{`車票號碼：${ticketResult.ticketId}`}</Typography>
               <Typography>{`出發時間：${ticketResult.arrivalTime}`}</Typography>
               <Typography>{`抵達時間：${ticketResult.departureTime}`}</Typography>
-              <Typography>{ticketResult.payment}</Typography>
+              <Typography>{ticketResult.totalPrice}</Typography>
             </>
           )}
           {'errorMessage' in ticketResult && (

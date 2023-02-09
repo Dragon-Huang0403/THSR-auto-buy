@@ -10,7 +10,7 @@ import type {
   PostConfirmTrainRequest,
   PostSubmitTicketRequest,
   SearchBookedTicketRequest,
-} from '~/src/models/thsr';
+} from '../schema/bookingRequestSchema.js';
 
 const searchBaseUrl = 'https://www.thsrc.com.tw';
 const baseUrl = 'https://irs.thsrc.com.tw';
