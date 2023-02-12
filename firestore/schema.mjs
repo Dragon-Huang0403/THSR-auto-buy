@@ -17,10 +17,18 @@ export const stationSchema = z.enum([
   'ZuoYing',
 ]);
 
-const dateTimeSchema = z
-  .number()
-  .transform((val) => new Date(val))
-  .or(z.date());
+/**
+ * Firestore @type {Date} as @type {Timestamp} but without any Timestamp methods, only properties
+ * So needed to be convert to Timestamp and then toDate
+ */
+const dateSchema = z
+  .instanceof(Timestamp)
+  .or(z.date())
+  .transform((value) =>
+    value instanceof Timestamp
+      ? new Timestamp(value.seconds, value.nanoseconds).toDate()
+      : value,
+  );
 
 export const ticketResultSchema = z
   .object({
@@ -28,12 +36,12 @@ export const ticketResultSchema = z
     arrivalTime: z.string(),
     departureTime: z.string(),
     totalPrice: z.number(),
-    updatedAt: dateTimeSchema,
+    updatedAt: dateSchema,
   })
   .or(
     z.object({
       errorMessage: z.string(),
-      updatedAt: dateTimeSchema,
+      updatedAt: dateSchema,
     }),
   );
 
@@ -41,7 +49,7 @@ export const reservationSchema = z.object({
   id: z.string(),
   startStation: stationSchema,
   endStation: stationSchema,
-  searchDate: dateTimeSchema,
+  searchDate: dateSchema,
   bookingMethod: z.enum(['trainNo', 'time']),
   trainNo: z.string(),
   /**
@@ -55,17 +63,7 @@ export const reservationSchema = z.object({
    * 2: Aisle Seat
    */
   seatType: z.literal(0).or(z.literal(1)).or(z.literal(2)),
-  /**
-   * Only allow Date in runtime, but it will be store in firestore as Timestamp
-   */
-  bookDate: z
-    .instanceof(Timestamp)
-    .or(z.date())
-    .transform((value) =>
-      value instanceof Timestamp
-        ? new Timestamp(value.seconds, value.nanoseconds).toDate()
-        : value,
-    ),
+  bookDate: dateSchema,
   /**
    * User Info
    */
@@ -82,7 +80,7 @@ export const reservationSchema = z.object({
   college: z.number().min(0).max(10),
 
   ticketResult: ticketResultSchema.or(z.null()),
-  createdAt: dateTimeSchema,
+  createdAt: dateSchema,
 });
 
 export const clientReservationSchema = reservationSchema.omit({
