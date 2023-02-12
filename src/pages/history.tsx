@@ -74,11 +74,11 @@ const Reservation = ({ reservation }: ReservationProps) => {
         </>
       ) : (
         <>
-          {reservation.trainNo ? (
+          {reservation.bookingMethod === 'trainNo' ? (
             <Typography>預定班次：{reservation.trainNo}</Typography>
           ) : (
             <Typography>
-              預計時間：{format(reservation.searchDate, 'hh:mm a')}
+              預計乘車時間：{format(reservation.searchDate, 'hh:mm a')}
             </Typography>
           )}
           <Typography>
