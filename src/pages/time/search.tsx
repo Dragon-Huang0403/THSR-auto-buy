@@ -77,7 +77,7 @@ function SearchPage() {
           (stopTime) => stopTime.StationID === stationIDs[0],
         )?.DepartureTime ?? '';
       const offsetSearchDate = subMinutes(searchDate, SEARCH_BUFFER_MINUTES);
-      const searchDateTime = format(offsetSearchDate, 'hh:mm');
+      const searchDateTime = format(offsetSearchDate, 'HH:mm');
       if (departureTime < searchDateTime) {
         return false;
       }
@@ -109,7 +109,8 @@ function SearchPage() {
       const hours = (diffMinutes - minutes) / 60;
       const duration = `${padTo2Digit(hours)}:${padTo2Digit(minutes)}`;
       return { trainNo, departureTime, arrivalTime, duration };
-    });
+    })
+    .sort((a, b) => parseInt(a.departureTime) - parseInt(b.departureTime));
 
   return (
     <>
