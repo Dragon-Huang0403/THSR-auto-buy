@@ -1,6 +1,6 @@
 import type { EmotionCache } from '@emotion/react';
 import { CacheProvider } from '@emotion/react';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { CssBaseline, NoSsr, ThemeProvider } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import type { AppProps } from 'next/app';
@@ -25,7 +25,7 @@ function MyApp(props: MyAppProps) {
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          {getLayout(<Component {...pageProps} />)}
+          <NoSsr>{getLayout(<Component {...pageProps} />)}</NoSsr>
         </LocalizationProvider>
       </ThemeProvider>
     </CacheProvider>

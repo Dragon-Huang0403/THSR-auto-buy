@@ -70,12 +70,6 @@ export const useTicketStore = create<TicketStore>()(
           if (!str) {
             return null;
           }
-          /**
-           * TODO: Fix mui input ssr class name not match issue
-           */
-          await new Promise((res) => {
-            setTimeout(res, 500);
-          });
 
           const oldState = superjson.parse<StorageValue<TicketStore>>(str);
 
