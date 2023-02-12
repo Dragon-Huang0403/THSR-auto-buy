@@ -64,9 +64,9 @@ const Reservation = ({ reservation }: ReservationProps) => {
           {'ticketId' in ticketResult && (
             <>
               <Typography>{`車票號碼：${ticketResult.ticketId}`}</Typography>
-              <Typography>{`出發時間：${ticketResult.arrivalTime}`}</Typography>
-              <Typography>{`抵達時間：${ticketResult.departureTime}`}</Typography>
-              <Typography>{ticketResult.totalPrice}</Typography>
+              <Typography>{`出發時間：${ticketResult.departureTime}`}</Typography>
+              <Typography>{`抵達時間：${ticketResult.arrivalTime}`}</Typography>
+              <Typography>{`總票價：${ticketResult.totalPrice}`}</Typography>
             </>
           )}
           {'errorMessage' in ticketResult && (
