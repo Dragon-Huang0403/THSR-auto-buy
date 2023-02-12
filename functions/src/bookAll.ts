@@ -35,7 +35,7 @@ async function getAvailableReservations(db: Firestore) {
 
 export async function bookAll(db: Firestore) {
   const reservations = await getAvailableReservations(db);
-  console.log('>> Get Data at: ', new Date());
+  console.log('>> Got Data at: ', new Date());
 
   await Promise.all(
     reservations.map(async (reservation) => {
@@ -65,6 +65,7 @@ export async function bookAll(db: Firestore) {
       };
       const collectionRef = db.collection(TABLE_NAME);
 
+      let ticketResult;
       try {
         let result;
         if (reservation.bookingMethod === 'trainNo') {
@@ -77,7 +78,7 @@ export async function bookAll(db: Firestore) {
           .int()
           .parse(Number(result.paymentDetails.at(-1)?.at(-1)));
 
-        const ticketResult = {
+        ticketResult = {
           ticketId: result.ticketId,
           arrivalTime: result.arrivalTime,
           departureTime: result.departureTime,
@@ -85,21 +86,20 @@ export async function bookAll(db: Firestore) {
           updatedAt: Timestamp.now(),
         };
 
-        await collectionRef
-          .doc(reservation.id)
-          .update('ticketResult', ticketResult, ['updatedAt', Timestamp.now()]);
-        console.log('>> Success: ', reservation.id, new Date());
+        console.log('>> Success: ', ticketResult);
       } catch (e) {
-        await collectionRef
-          .doc(reservation.id)
-          .update('ticketResult', { errorMessage: (e as Error).message }, [
-            'updatedAt',
-            new Date(),
-          ]);
-        console.error('>> error: ', e, new Date());
+        ticketResult = {
+          errorMessage: (e as Error).message,
+          updatedAt: Timestamp.now(),
+        };
+
+        console.error('>> Error: ', ticketResult);
       }
+      await collectionRef
+        .doc(reservation.id)
+        .update('ticketResult', ticketResult);
     }),
   );
-  console.log('>> Completed: ');
+  console.log('>> Completed!!');
   return null;
 }
