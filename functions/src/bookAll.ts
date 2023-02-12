@@ -9,6 +9,14 @@ import { STATION_OBJECTS } from './thsr/utils/constants.js';
 import { findNearestSelectedTime } from './thsr/utils/searchApis.js';
 
 const TABLE_NAME = 'reservations';
+const TIME_ZONE = 'Asia/Taipei';
+
+function offsetTimeZoneToAsiaTaipei(date: Date) {
+  const taipeiDateString = date.toLocaleString('en-US', {
+    timeZone: TIME_ZONE,
+  });
+  return new Date(taipeiDateString);
+}
 
 async function getAvailableReservations(db: Firestore) {
   const now = new Date();
@@ -21,10 +29,8 @@ async function getAvailableReservations(db: Firestore) {
     Object.fromEntries(
       Object.entries(doc.data()).map(([key, value]) => {
         if (value instanceof Timestamp) {
-          return [
-            key,
-            new Timestamp(value.seconds, value.nanoseconds).toDate(),
-          ];
+          const date = new Timestamp(value.seconds, value.nanoseconds).toDate();
+          return [key, offsetTimeZoneToAsiaTaipei(date)];
         }
         return [key, value];
       }),
