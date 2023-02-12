@@ -10,6 +10,7 @@ import {
   RadioGroup,
   styled,
   TextField,
+  Typography,
 } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { addDays } from 'date-fns';
@@ -192,6 +193,72 @@ const ReservePage = () => {
           }}
         />
       )}
+      <Typography sx={{ color: (theme) => theme.palette.text.secondary }}>
+        選擇車票數量
+      </Typography>
+      <TextField
+        id="input-trainNo"
+        required
+        label="全票"
+        type={'number'}
+        value={ticketStore.adult}
+        onChange={(e) => {
+          dispatch({
+            payload: { adult: Number(e.target.value) },
+          });
+        }}
+      />
+      <TextField
+        id="input-trainNo"
+        required
+        label="孩童票"
+        type={'number'}
+        value={ticketStore.child}
+        onChange={(e) => {
+          dispatch({
+            payload: { child: Number(e.target.value) },
+          });
+        }}
+      />
+      <TextField
+        id="input-trainNo"
+        required
+        label="愛心票"
+        type={'number'}
+        value={ticketStore.disabled}
+        onChange={(e) => {
+          dispatch({
+            payload: { disabled: Number(e.target.value) },
+          });
+        }}
+      />
+      <TextField
+        id="input-trainNo"
+        required
+        label="敬老票"
+        type={'number'}
+        value={ticketStore.elder}
+        onChange={(e) => {
+          dispatch({
+            payload: { elder: Number(e.target.value) },
+          });
+        }}
+      />
+      <TextField
+        id="input-trainNo"
+        required
+        label="大學生票"
+        type={'number'}
+        value={ticketStore.college}
+        onChange={(e) => {
+          dispatch({
+            payload: { college: Number(e.target.value) },
+          });
+        }}
+      />
+      <Typography sx={{ color: (theme) => theme.palette.text.secondary }}>
+        個人資料
+      </Typography>
       <Box sx={{ display: 'flex', justifyContent: 'stretch', gap: 2 }}>
         <TextField
           id="input-taiwanId"
@@ -204,10 +271,13 @@ const ReservePage = () => {
               payload: { taiwanId: e.target.value },
             });
           }}
+          FormHelperTextProps={{
+            sx: { mx: 1 },
+          }}
+          helperText="身分證字號僅用來與訂票號碼索取車票用"
         />
-
         <Button
-          sx={{ height: '100%' }}
+          sx={{ height: '100%', width: 90 }}
           onClick={() => {
             const randomId = getRandomTaiwanId();
             dispatch({

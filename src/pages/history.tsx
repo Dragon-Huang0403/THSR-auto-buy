@@ -1,7 +1,6 @@
 import { CalendarMonthRounded, EastRounded } from '@mui/icons-material';
 import { Box, Button, styled, TextField, Typography } from '@mui/material';
 import { format } from 'date-fns';
-import { useState } from 'react';
 
 import { STATION_OBJECTS, TICKET_TYPES } from '~/src/utils/constants';
 import type { RouterOutputs } from '~/src/utils/trpc';
@@ -92,8 +91,11 @@ const Reservation = ({ reservation }: ReservationProps) => {
 };
 
 const HistoryPage = () => {
-  const _taiwanId = useTicketStore((state) => state.taiwanId);
-  const [taiwanId, setTaiwanId] = useState(() => _taiwanId);
+  const { taiwanId, dispatch } = useTicketStore((state) => ({
+    taiwanId: state.taiwanId,
+    dispatch: state.dispatch,
+  }));
+
   const history = trpc.ticket.history.useQuery(
     { taiwanId },
     { enabled: false },
@@ -114,7 +116,11 @@ const HistoryPage = () => {
           label="輸入身分證字號"
           value={taiwanId}
           onChange={(e) => {
-            setTaiwanId(e.target.value);
+            dispatch({
+              payload: {
+                taiwanId: e.target.value,
+              },
+            });
           }}
         />
         <Button type="submit">查詢</Button>
