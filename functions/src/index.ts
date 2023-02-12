@@ -42,8 +42,12 @@ async function getAvailableReservations() {
 export const bookAll = functions
   .runWith({ secrets: ['CAPTCHA_KEY'] })
   .region('asia-east1')
-  .https.onRequest(async (req, res) => {
+  .pubsub.schedule('0 0 * * *')
+  .timeZone('Asia/Taipei')
+  .onRun(async () => {
     const reservations = await getAvailableReservations();
+    console.log('>> Get Data at: ', new Date());
+
     await Promise.all(
       reservations.map(async (reservation) => {
         if (!reservation) {
@@ -99,6 +103,7 @@ export const bookAll = functions
               'updatedAt',
               Timestamp.now(),
             ]);
+          console.log('>> Success: ', reservation.id, new Date());
         } catch (e) {
           await collectionRef
             .doc(reservation.id)
@@ -106,9 +111,10 @@ export const bookAll = functions
               'updatedAt',
               new Date(),
             ]);
-          res.json({ success: false, error: e });
+          console.error('>> error: ', e, new Date());
         }
       }),
     );
-    res.json({ success: true });
+    console.log('>> Completed: ');
+    return null;
   });
