@@ -135,6 +135,11 @@ const HistoryPage = () => {
           height: '100%',
         }}
       >
+        {history.error && !history.data && (
+          <Typography>{history.error.message}</Typography>
+        )}
+        {history.isFetching && <Typography>載入中...</Typography>}
+        {history.data?.length === 0 && <Typography>查無此人</Typography>}
         {history.data?.map((reservation) => (
           <Reservation key={reservation.id} reservation={reservation} />
         ))}

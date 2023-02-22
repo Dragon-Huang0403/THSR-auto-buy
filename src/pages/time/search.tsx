@@ -45,7 +45,7 @@ function SearchPage() {
     shallow,
   );
 
-  const { data, error } = trpc.time.regular.useQuery(undefined, {
+  const { data, error, isFetching } = trpc.time.regular.useQuery(undefined, {
     staleTime: Infinity,
   });
 
@@ -144,6 +144,7 @@ function SearchPage() {
         })`}
       </Typography>
       {error && <Typography>{error.message}</Typography>}
+      {isFetching && <Typography>載入中...</Typography>}
       <Box
         sx={{
           display: 'flex',
