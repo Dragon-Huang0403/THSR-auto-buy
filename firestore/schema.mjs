@@ -87,5 +87,5 @@ export const clientReservationSchema = reservationSchema.omit({
   id: true,
   ticketResult: true,
   createdAt: true,
-  updatedAt: true,
+  bookDate: true,
 });

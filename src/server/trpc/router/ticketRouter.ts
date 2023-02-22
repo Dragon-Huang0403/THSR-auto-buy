@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { reservationSchema } from '~/firestore/schema.mjs';
+import { clientReservationSchema } from '~/firestore/schema.mjs';
 import { addReservation, findReservations } from '~/src/server/db/firestore';
 import { getBookDate } from '~/src/utils/helper';
 import { checkTaiwanId } from '~/src/utils/taiwanIdGenerator';
@@ -9,19 +9,14 @@ import { publicProcedure, router } from '../trpc';
 
 export const ticketRouter = router({
   reserve: publicProcedure
-    .input(
-      reservationSchema.omit({
-        id: true,
-        ticketResult: true,
-        createdAt: true,
-        bookDate: true,
-      }),
-    )
+    .input(clientReservationSchema)
     .mutation(async ({ input }) => {
       const bookDate = getBookDate(input.searchDate);
       await addReservation({
         ...input,
         bookDate,
+        createdAt: new Date(),
+        ticketResult: null,
       });
     }),
   history: publicProcedure
